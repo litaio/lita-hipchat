@@ -1,0 +1,1 @@
+# lita-hipchat
