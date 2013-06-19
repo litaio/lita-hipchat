@@ -16,7 +16,6 @@ module Lita
       require_configs :jid, :password
 
       def run
-        @main_thread = Thread.current
         @jid = Jabber::JID.new(Lita.config.adapter.jid)
         @client = Jabber::Client.new(@jid)
         @browser = Jabber::MUC::MUCBrowser.new(@client)
@@ -60,7 +59,6 @@ module Lita
         @client.connect
         @client.auth(Lita.config.adapter.password)
         @client.send(Jabber::Presence.new(:chat))
-        @connected_at = Time.now
       end
 
       def join_rooms
