@@ -93,11 +93,7 @@ module Lita
           rooms = @browser.muc_rooms(domain).map { |jid, name| jid }
         end
 
-        if rooms && !rooms.respond_to?(:each)
-          rooms = [rooms]
-        end
-
-        rooms
+        Array(rooms)
       end
     end
 
