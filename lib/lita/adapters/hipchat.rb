@@ -14,7 +14,10 @@ module Lita
       def initialize(robot)
         super
 
-        Jabber.debug = true if Lita.config.adapter.debug
+        if Lita.config.adapter.debug
+          Lita.logger.debug("Turning Jabber debug logging on.")
+          Jabber.debug = true
+        end
 
         jid = Jabber::JID.new(Lita.config.adapter.jid)
         jid.resource = "bot"
@@ -25,6 +28,10 @@ module Lita
         connect
         join_rooms
         sleep
+      rescue Interrupt => e
+        Lita.logger.info("Disconnecting from HipChat.")
+        @client.close
+        exit
       end
 
       def send_messages(source, strings)
@@ -35,6 +42,7 @@ module Lita
           strings.each do |s|
             message = Jabber::Message.new(source.user.id, s)
             message.type = :chat
+
             @client.send(message)
           end
         end
@@ -43,14 +51,17 @@ module Lita
       private
 
       def connect
+        Lita.logger.info("Connecting to HipChat.")
         @client.connect
         @client.auth(Lita.config.adapter.password)
         @client.send(Jabber::Presence.new(:chat))
+        Lita.logger.info("Connected to HipChat.")
 
         register_message_callback
 
         @roster = Jabber::Roster::Helper.new(@client)
         @roster.wait_for_roster
+        Lita.logger.debug("Roster received.")
 
         @browser = Jabber::MUC::MUCBrowser.new(@client)
       end
@@ -62,6 +73,7 @@ module Lita
           source = Source.new(user)
           message = Message.new(robot, m.body, source)
           message.command!
+          Lita.logger.info("Dispatching private message to robot.")
           robot.receive(message)
         end
       end
@@ -74,6 +86,7 @@ module Lita
           muc = Jabber::MUC::SimpleMUCClient.new(@client)
           register_room_message_callback(muc)
           room_jid = Jabber::JID.new("#{room_name}/#{robot.name}")
+          Lita.logger.info("Joining room: #{room_name}.")
           muc.join(room_jid)
 
           @mucs[muc.jid.bare.to_s] = muc
@@ -98,6 +111,7 @@ module Lita
           user = user_by_nick(nick)
           source = Source.new(user, muc.jid.bare.to_s)
           message = Message.new(robot, text, source)
+          Lita.logger.info("Dispatching room message to robot.")
           robot.receive(message)
         end
       end
