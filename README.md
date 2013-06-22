@@ -33,7 +33,7 @@ Values for all of the following attributes can be found on the "XMPP/Jabber info
 
 ### Example
 
-```
+``` ruby
 Lita.configure do |config|
   config.robot.name = "Lita Bot"
   config.robot.adapter = :hipchat
