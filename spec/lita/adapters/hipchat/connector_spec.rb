@@ -119,6 +119,16 @@ describe Lita::Adapters::HipChat::Connector do
     end
   end
 
+  describe "#message_muc" do
+    it "sends the messages to the room" do
+      muc = double("Jabber::MUC::SimpleMUCClient")
+      allow(subject).to receive(:mucs).and_return("jid" => muc)
+      expect(muc).to receive(:say).with("foo")
+      expect(muc).to receive(:say).with("bar")
+      subject.message_muc("jid", ["foo", "bar"])
+    end
+  end
+
   describe "#set_topic" do
     it "sets the room's topic to the supplied message" do
       muc = double("Jabber::MUC::SimpleMUCClient")

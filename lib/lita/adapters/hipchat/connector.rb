@@ -41,6 +41,11 @@ module Lita
           browser.muc_rooms(muc_domain).map { |jid, name| jid.to_s }
         end
 
+        def message_muc(room_jid, strings)
+          muc = mucs[room_jid]
+          strings.each { |s| muc.say(s) } if muc
+        end
+
         def mucs
           @mucs ||= {}
         end
