@@ -45,6 +45,11 @@ module Lita
           @mucs ||= {}
         end
 
+        def set_topic(room_jid, topic)
+          muc = mucs[room_jid]
+          muc.subject = topic if muc
+        end
+
         def shut_down
           client.close
         end

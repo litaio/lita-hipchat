@@ -119,6 +119,15 @@ describe Lita::Adapters::HipChat::Connector do
     end
   end
 
+  describe "#set_topic" do
+    it "sets the room's topic to the supplied message" do
+      muc = double("Jabber::MUC::SimpleMUCClient")
+      allow(subject).to receive(:mucs).and_return("jid" => muc)
+      expect(muc).to receive(:subject=).with("New topic")
+      subject.set_topic("jid", "New topic")
+    end
+  end
+
   describe "#shut_down" do
     it "closes the client connection" do
       expect(subject.client).to receive(:close)
