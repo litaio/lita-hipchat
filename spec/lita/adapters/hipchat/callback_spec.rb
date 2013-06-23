@@ -14,7 +14,7 @@ describe Lita::Adapters::HipChat::Callback do
 
   before do
     allow(roster).to receive(:[]).with("user_id").and_return(
-      double("RosterItem", attributes: {
+      double("Jabber::Roster::RosterItem", attributes: {
         "jid" => "user_id",
         "name" => "Carl",
         "mention_name" => "@Carl"
