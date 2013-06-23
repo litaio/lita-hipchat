@@ -7,9 +7,10 @@ module Lita
   module Adapters
     class HipChat < Adapter
       class Connector
-        attr_reader :client, :roster
+        attr_reader :robot, :client, :roster
 
-        def initialize(jid, password, debug: false)
+        def initialize(robot, jid, password, debug: false)
+          @robot = robot
           @jid = normalized_jid(jid, "chat.hipchat.com", "bot")
           @password = password
           @client = Jabber::Client.new(@jid)
@@ -29,7 +30,7 @@ module Lita
         def join_rooms(muc_domain, rooms)
           rooms.each do |room_name|
             muc = Jabber::MUC::SimpleMUCClient.new(client)
-            room_jid = normalized_jid(room_name, muc_domain, robot_name)
+            room_jid = normalized_jid(room_name, muc_domain, robot.name)
             mucs[room_jid.bare.to_s] = muc
             register_muc_message_callback(muc)
             muc.join(room_jid)
@@ -98,10 +99,6 @@ module Lita
             jid.domain = domain
           end
           jid
-        end
-
-        def robot_name
-          Lita.config.robot.name
         end
       end
     end

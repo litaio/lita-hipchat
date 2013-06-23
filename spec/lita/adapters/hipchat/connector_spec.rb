@@ -1,30 +1,31 @@
 require "spec_helper"
 
 describe Lita::Adapters::HipChat::Connector do
-  subject { described_class.new("user", "secret") }
+  subject { described_class.new(robot, "user", "secret") }
 
   let(:client) { double("Jabber::Client").as_null_object }
+  let(:robot) { double("Lita::Robot", name: "Lita" ) }
 
   before { allow(subject).to receive(:client).and_return(client) }
 
   it "sets the JID properly when only a node is supplied" do
-    subject = described_class.new("user", "secret")
+    subject = described_class.new(robot, "user", "secret")
     expect(subject.jid).to eq("user@chat.hipchat.com/bot")
   end
 
   it "sets the JID properly when a node and domain are supplied" do
-    subject = described_class.new("user@example.com", "secret")
+    subject = described_class.new(robot, "user@example.com", "secret")
     expect(subject.jid).to eq("user@example.com/bot")
   end
 
   it "sets the JID properly when a resource is supplied" do
-    subject = described_class.new("user@example.com/wrong", "secret")
+    subject = described_class.new(robot, "user@example.com/wrong", "secret")
     expect(subject.jid).to eq("user@example.com/bot")
   end
 
   it "turns on the xmpp4r logger if debug: true is supplied" do
     expect(Jabber).to receive(:debug=).with(true)
-    subject = described_class.new("user", "secret", debug: true)
+    subject = described_class.new(robot, "user", "secret", debug: true)
   end
 
   describe "#connect" do
