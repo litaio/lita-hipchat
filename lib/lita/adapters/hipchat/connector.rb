@@ -9,17 +9,9 @@ module Lita
         attr_reader :client, :roster
 
         def initialize(jid, password, debug: false)
-          @jid = Jabber::JID.new(jid)
-          @jid.resource = "bot"
-
-          unless @jid.node
-            @jid.node = @jid.domain
-            @jid.domain = "chat.hipchat.com"
-          end
-
+          @jid = normalized_jid(jid, "chat.hipchat.com", "bot")
           @password = password
           @client = Jabber::Client.new(@jid)
-
           Jabber.debug = true if debug
         end
 
@@ -36,12 +28,7 @@ module Lita
         def join_rooms(muc_domain, rooms)
           rooms.each do |room_name|
             muc = Jabber::MUC::SimpleMUCClient.new(client)
-            room_jid = Jabber::JID.new(room_name)
-            room_jid.resource = robot_name
-            unless room_jid.node
-              room_jid.node = room_jid.domain
-              room_jid.domain = muc_domain
-            end
+            room_jid = normalized_jid(room_name, muc_domain, robot_name)
             mucs[room_jid.bare.to_s] = muc
             register_muc_message_callback(muc)
             muc.join(room_jid)
@@ -77,6 +64,16 @@ module Lita
         def load_roster
           @roster = Jabber::Roster::Helper.new(client)
           roster.wait_for_roster
+        end
+
+        def normalized_jid(jid, domain, resource)
+          jid = Jabber::JID.new(jid)
+          jid.resource = resource
+          unless jid.node
+            jid.node = jid.domain
+            jid.domain = domain
+          end
+          jid
         end
 
         def robot_name
