@@ -52,7 +52,7 @@ module Lita
 
       def rooms
         if config.rooms == :all
-          connector.list_rooms
+          connector.list_rooms(config.muc_domain)
         else
           Array(config.rooms)
         end

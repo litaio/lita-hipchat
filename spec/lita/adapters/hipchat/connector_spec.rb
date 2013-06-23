@@ -98,6 +98,27 @@ describe Lita::Adapters::HipChat::Connector do
     end
   end
 
+  describe "#list_rooms" do
+    let(:browser) { double("Jabber::MUC::MUCBrowser") }
+
+    before do
+      allow(Jabber::MUC::MUCBrowser).to receive(:new).with(client).and_return(
+        browser
+      )
+    end
+
+    it "returns an array of room JIDs for the MUC domain" do
+      allow(browser).to receive(:muc_rooms).with("conf.hipchat.com").and_return(
+        "123_456@conf.hipchat.com" => "Room 1",
+        "789_012@conf.hipchat.com" => "Room 2"
+      )
+      expect(subject.list_rooms("conf.hipchat.com")).to eq([
+        "123_456@conf.hipchat.com",
+        "789_012@conf.hipchat.com"
+      ])
+    end
+  end
+
   describe "#shut_down" do
     it "closes the client connection" do
       expect(subject.client).to receive(:close)

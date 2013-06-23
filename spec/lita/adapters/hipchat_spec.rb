@@ -49,7 +49,9 @@ describe Lita::Adapters::HipChat do
     it "joins all rooms when config.rooms is :all" do
       all_rooms = ["room_1_id", "room_2_id"]
       Lita.config.adapter.rooms = :all
-      allow(subject.connector).to receive(:list_rooms).and_return(all_rooms)
+      allow(subject.connector).to receive(:list_rooms).with(
+        "conf.hipchat.com"
+      ).and_return(all_rooms)
       expect(subject.connector).to receive(:join_rooms).with(
         "conf.hipchat.com",
         all_rooms

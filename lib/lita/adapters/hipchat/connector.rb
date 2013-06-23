@@ -1,6 +1,7 @@
 require "xmpp4r"
 require "xmpp4r/roster/helper/roster"
 require "xmpp4r/muc/helper/simplemucclient"
+require "xmpp4r/muc/helper/mucbrowser"
 
 module Lita
   module Adapters
@@ -33,6 +34,11 @@ module Lita
             register_muc_message_callback(muc)
             muc.join(room_jid)
           end
+        end
+
+        def list_rooms(muc_domain)
+          browser = Jabber::MUC::MUCBrowser.new(client)
+          browser.muc_rooms(muc_domain).map { |jid, name| jid.to_s }
         end
 
         def mucs
