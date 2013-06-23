@@ -42,6 +42,7 @@ describe Lita::Adapters::HipChat::Connector do
         callback
       )
       allow(callback).to receive(:private_message)
+      allow(robot).to receive(:mention_name=)
     end
 
     it "connects to HipChat" do
@@ -71,6 +72,16 @@ describe Lita::Adapters::HipChat::Connector do
 
     it "loads a roster" do
       expect(roster).to receive(:wait_for_roster)
+      subject.connect
+    end
+
+    it "assigns the robot's mention_name with info from the roster" do
+      allow(roster).to receive(:[]).with(subject.jid).and_return(
+        double("Jabber::Roster::RosterItem", attributes: {
+          "mention_name" => "LitaBot"
+        })
+      )
+      expect(robot).to receive(:mention_name=).with("LitaBot")
       subject.connect
     end
   end

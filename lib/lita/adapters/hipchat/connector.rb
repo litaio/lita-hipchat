@@ -106,6 +106,7 @@ module Lita
           Lita.logger.debug("Loading roster.")
           @roster = Jabber::Roster::Helper.new(client)
           roster.wait_for_roster
+          robot.mention_name = roster[jid].attributes["mention_name"]
         end
 
         def normalized_jid(jid, domain, resource)
