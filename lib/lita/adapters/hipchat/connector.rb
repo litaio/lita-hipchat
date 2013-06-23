@@ -83,8 +83,7 @@ module Lita
         end
 
         def register_muc_message_callback(muc)
-          muc.on_message do |time, nick, text|
-          end
+          Callback.new(robot, roster).muc_message(muc)
         end
 
         def load_roster

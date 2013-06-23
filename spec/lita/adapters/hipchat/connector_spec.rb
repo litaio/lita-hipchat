@@ -80,11 +80,18 @@ describe Lita::Adapters::HipChat::Connector do
     let(:rooms) { ["muc_1", "muc_2"] }
     let(:muc_1) { double("Jabber::MUC::SimpleMUCClient").as_null_object }
     let(:muc_2) { double("Jabber::MUC::SimpleMUCClient").as_null_object }
+    let(:callback) { double("Lita::Adapters::HipChat::Callback") }
+    let(:roster) { double("Jabber::Roster::Helper") }
 
     before do
       allow(Jabber::MUC::SimpleMUCClient).to receive(:new).with(
         client
       ).and_return(muc_1, muc_2)
+      allow(Lita::Adapters::HipChat::Callback).to receive(:new).and_return(
+        callback
+      )
+      allow(callback).to receive(:muc_message)
+      allow(subject).to receive(:roster).and_return(roster)
     end
 
     it "creates a SimpleMUCClient for each room" do
@@ -96,8 +103,12 @@ describe Lita::Adapters::HipChat::Connector do
     end
 
     it "registers a message callback for each room" do
-      expect(muc_1).to receive(:on_message)
-      expect(muc_2).to receive(:on_message)
+      expect(Lita::Adapters::HipChat::Callback).to receive(:new).with(
+        robot,
+        roster
+      ).and_return(callback)
+      expect(callback).to receive(:muc_message).with(muc_1)
+      expect(callback).to receive(:muc_message).with(muc_2)
       subject.join_rooms(muc_domain, rooms)
     end
 
