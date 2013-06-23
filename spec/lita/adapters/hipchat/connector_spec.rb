@@ -1,6 +1,12 @@
 require "spec_helper"
 
 describe Lita::Adapters::HipChat::Connector do
+  subject { described_class.new("user", "secret") }
+
+  let(:client) { double("Jabber::Client").as_null_object }
+
+  before { allow(subject).to receive(:client).and_return(client) }
+
   it "sets the JID properly when only a node is supplied" do
     subject = described_class.new("user", "secret")
     expect(subject.jid).to eq("user@chat.hipchat.com/bot")
@@ -22,14 +28,10 @@ describe Lita::Adapters::HipChat::Connector do
   end
 
   describe "#connect" do
-    subject { described_class.new("user", "secret") }
-
-    let(:client) { double("Jabber::Client").as_null_object }
     let(:presence) { double("Jabber::Presence") }
     let(:roster) { double("Jabber::Roster::Helper").as_null_object }
 
     before do
-      allow(subject).to receive(:client).and_return(client)
       allow(Jabber::Presence).to receive(:new).and_return(presence)
       allow(Jabber::Roster::Helper).to receive(:new).with(client).and_return(
         roster
@@ -60,6 +62,39 @@ describe Lita::Adapters::HipChat::Connector do
     it "loads a roster" do
       expect(roster).to receive(:wait_for_roster)
       subject.connect
+    end
+  end
+
+  describe "#join rooms" do
+    let(:muc_domain) { "conf.hipchat.com" }
+    let(:rooms) { ["muc_1", "muc_2"] }
+    let(:muc_1) { double("Jabber::MUC::SimpleMUCClient").as_null_object }
+    let(:muc_2) { double("Jabber::MUC::SimpleMUCClient").as_null_object }
+
+    before do
+      allow(Jabber::MUC::SimpleMUCClient).to receive(:new).with(
+        client
+      ).and_return(muc_1, muc_2)
+    end
+
+    it "creates a SimpleMUCClient for each room" do
+      subject.join_rooms(muc_domain, rooms)
+      expect(subject.mucs).to eq(
+        "muc_1@conf.hipchat.com" => muc_1,
+        "muc_2@conf.hipchat.com" => muc_2,
+      )
+    end
+
+    it "registers a message callback for each room" do
+      expect(muc_1).to receive(:on_message)
+      expect(muc_2).to receive(:on_message)
+      subject.join_rooms(muc_domain, rooms)
+    end
+
+    it "joins each room" do
+      expect(muc_1).to receive(:join)
+      expect(muc_2).to receive(:join)
+      subject.join_rooms(muc_domain, rooms)
     end
   end
 end
