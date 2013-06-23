@@ -14,6 +14,7 @@ module Lita
         set_default_config_values
 
         @connector = Connector.new(
+          robot,
           config.jid,
           config.password,
           debug: config.debug
