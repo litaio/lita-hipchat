@@ -97,4 +97,11 @@ describe Lita::Adapters::HipChat::Connector do
       subject.join_rooms(muc_domain, rooms)
     end
   end
+
+  describe "#shut_down" do
+    it "closes the client connection" do
+      expect(subject.client).to receive(:close)
+      subject.shut_down
+    end
+  end
 end

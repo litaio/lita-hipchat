@@ -52,6 +52,10 @@ module Lita
           @mucs ||= {}
         end
 
+        def shut_down
+          client.close
+        end
+
         private
 
         def client_connect
