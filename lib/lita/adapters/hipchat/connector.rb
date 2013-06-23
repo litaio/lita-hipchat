@@ -31,6 +31,7 @@ module Lita
           client_connect
           load_roster
           register_message_callback
+          send_presence
         end
 
         def join_rooms(muc_domain, rooms)
@@ -86,13 +87,16 @@ module Lita
 
         private
 
+        def send_presence
+          Lita.logger.debug("Sending initial XMPP presence.")
+          client.send(Jabber::Presence.new(:chat))
+        end
+
         def client_connect
           Lita.logger.info("Connecting to HipChat.")
           client.connect
           Lita.logger.debug("Authenticating with HipChat.")
           client.auth(@password)
-          Lita.logger.debug("Sending initial XMPP presence.")
-          client.send(Jabber::Presence.new(:chat))
         end
 
         def register_message_callback
