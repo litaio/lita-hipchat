@@ -119,6 +119,25 @@ describe Lita::Adapters::HipChat::Connector do
     end
   end
 
+  describe "#message_jid" do
+    let(:message_1) { double("Jabber::Message") }
+    let(:message_2) { double("Jabber::Message") }
+
+    it "sends the messages to the user" do
+      allow(Jabber::Message).to receive(:new).with("jid", "foo").and_return(
+        message_1
+      )
+      allow(Jabber::Message).to receive(:new).with("jid", "bar").and_return(
+        message_2
+      )
+      expect(message_1).to receive(:type=).with(:chat)
+      expect(message_2).to receive(:type=).with(:chat)
+      expect(client).to receive(:send).with(message_1)
+      expect(client).to receive(:send).with(message_2)
+      subject.message_jid("jid", ["foo", "bar"])
+    end
+  end
+
   describe "#message_muc" do
     it "sends the messages to the room" do
       muc = double("Jabber::MUC::SimpleMUCClient")

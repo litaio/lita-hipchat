@@ -41,6 +41,14 @@ module Lita
           browser.muc_rooms(muc_domain).map { |jid, name| jid.to_s }
         end
 
+        def message_jid(user_jid, strings)
+          strings.each do |s|
+            message = Jabber::Message.new(user_jid, s)
+            message.type = :chat
+            client.send(message)
+          end
+        end
+
         def message_muc(room_jid, strings)
           muc = mucs[room_jid]
           strings.each { |s| muc.say(s) } if muc
