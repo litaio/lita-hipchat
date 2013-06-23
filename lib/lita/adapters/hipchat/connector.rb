@@ -1,3 +1,5 @@
+require "lita/adapters/hipchat/callback"
+
 require "xmpp4r"
 require "xmpp4r/roster/helper/roster"
 require "xmpp4r/muc/helper/simplemucclient"
@@ -23,8 +25,8 @@ module Lita
 
         def connect
           client_connect
-          register_message_callback
           load_roster
+          register_message_callback
         end
 
         def join_rooms(muc_domain, rooms)
@@ -77,8 +79,7 @@ module Lita
         end
 
         def register_message_callback
-          client.add_message_callback do |m|
-          end
+          Callback.new(robot, roster).private_message(client)
         end
 
         def register_muc_message_callback(muc)

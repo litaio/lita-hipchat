@@ -31,12 +31,17 @@ describe Lita::Adapters::HipChat::Connector do
   describe "#connect" do
     let(:presence) { double("Jabber::Presence") }
     let(:roster) { double("Jabber::Roster::Helper").as_null_object }
+    let(:callback) { double("Lita::Adapters::HipChat::Callback") }
 
     before do
       allow(Jabber::Presence).to receive(:new).and_return(presence)
       allow(Jabber::Roster::Helper).to receive(:new).with(client).and_return(
         roster
       )
+      allow(Lita::Adapters::HipChat::Callback).to receive(:new).and_return(
+        callback
+      )
+      allow(callback).to receive(:private_message)
     end
 
     it "connects to HipChat" do
@@ -56,7 +61,11 @@ describe Lita::Adapters::HipChat::Connector do
     end
 
     it "registers a message callback" do
-      expect(subject.client).to receive(:add_message_callback)
+      expect(Lita::Adapters::HipChat::Callback).to receive(:new).with(
+        robot,
+        roster
+      ).and_return(callback)
+      expect(callback).to receive(:private_message).with(client)
       subject.connect
     end
 
