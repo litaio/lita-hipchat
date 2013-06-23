@@ -87,6 +87,7 @@ module Lita
         private
 
         def client_connect
+          Lita.logger.info("Connecting to HipChat.")
           client.connect
           Lita.logger.debug("Authenticating with HipChat.")
           client.auth(@password)
