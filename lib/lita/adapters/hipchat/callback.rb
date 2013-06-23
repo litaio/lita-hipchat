@@ -16,6 +16,7 @@ module Lita
             source = Source.new(user)
             message = Message.new(robot, m.body, source)
             message.command!
+            Lita.logger.debug("Dispatching PM to Lita from #{user.id}.")
             robot.receive(message)
           end
         end
@@ -25,6 +26,9 @@ module Lita
             user = user_by_name(nick)
             source = Source.new(user, muc.jid.bare.to_s)
             message = Message.new(robot, text, source)
+            Lita.logger.debug(
+              "Dispatching message to Lita from #{user.id} in MUC #{muc.jid}."
+            )
             robot.receive(message)
           end
         end
@@ -32,6 +36,7 @@ module Lita
         private
 
         def user_by_jid(jid)
+          Lita.logger.debug("Looking up user with JID: #{jid}.")
           user_data = roster[jid].attributes
 
           User.create(
@@ -42,6 +47,7 @@ module Lita
         end
 
         def user_by_name(name)
+          Lita.logger.debug("Looking up user with name: #{name}.")
           jid = roster.items.detect { |jid, item| item.iname == name }.first
           user_by_jid(jid)
         end

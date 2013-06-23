@@ -16,7 +16,10 @@ module Lita
           @jid = normalized_jid(jid, "chat.hipchat.com", "bot")
           @password = password
           @client = Jabber::Client.new(@jid)
-          Jabber.debug = true if debug
+          if debug
+            Lita.logger.info("Enabling Jabber log.")
+            Jabber.debug = true
+          end
         end
 
         def jid
@@ -35,17 +38,20 @@ module Lita
             room_jid = normalized_jid(room_name, muc_domain, robot.name)
             mucs[room_jid.bare.to_s] = muc
             register_muc_message_callback(muc)
+            Lita.logger.info("Joining room: #{room_jid}.")
             muc.join(room_jid)
           end
         end
 
         def list_rooms(muc_domain)
+          Lita.logger.debug("Querying server for list of rooms.")
           browser = Jabber::MUC::MUCBrowser.new(client)
           browser.muc_rooms(muc_domain).map { |jid, name| jid.to_s }
         end
 
         def message_jid(user_jid, strings)
           strings.each do |s|
+            Lita.logger.debug("Sending message to JID #{user_jid}: #{s}")
             message = Jabber::Message.new(user_jid, s)
             message.type = :chat
             client.send(message)
@@ -54,7 +60,10 @@ module Lita
 
         def message_muc(room_jid, strings)
           muc = mucs[room_jid]
-          strings.each { |s| muc.say(s) } if muc
+          strings.each do |s|
+            Lita.logger.debug("Sending message to MUC #{room_jid}: #{s}")
+            muc.say(s)
+          end if muc
         end
 
         def mucs
@@ -63,10 +72,14 @@ module Lita
 
         def set_topic(room_jid, topic)
           muc = mucs[room_jid]
-          muc.subject = topic if muc
+          if muc
+            Lita.logger.debug("Setting topic for MUC #{room_jid}: #{topic}")
+            muc.subject = topic
+          end
         end
 
         def shut_down
+          Lita.logger.info("Disconnecting from HipChat.")
           client.close
         end
 
@@ -74,7 +87,9 @@ module Lita
 
         def client_connect
           client.connect
+          Lita.logger.debug("Authenticating with HipChat.")
           client.auth(@password)
+          Lita.logger.debug("Sending initial XMPP presence.")
           client.send(Jabber::Presence.new(:chat))
         end
 
@@ -87,6 +102,7 @@ module Lita
         end
 
         def load_roster
+          Lita.logger.debug("Loading roster.")
           @roster = Jabber::Roster::Helper.new(client)
           roster.wait_for_roster
         end

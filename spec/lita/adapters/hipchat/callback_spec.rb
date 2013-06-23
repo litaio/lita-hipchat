@@ -8,7 +8,7 @@ describe Lita::Adapters::HipChat::Callback do
   let(:roster) do
     double("Jabber::Roster::Helper", items: { "user_id" => roster_item })
   end
-  let(:user) { double("Lita::User") }
+  let(:user) { double("Lita::User", id: "user_id") }
   let(:source) { double("Lita::Source") }
   let(:message) { double("Lita::Message") }
 
