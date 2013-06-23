@@ -11,7 +11,7 @@ module Lita
 
         def private_message(client)
           client.add_message_callback do |m|
-            next if m.type == :error
+            next if m.type == :error || m.body.nil?
             user = user_by_jid(m.from)
             source = Source.new(user)
             message = Message.new(robot, m.body, source)

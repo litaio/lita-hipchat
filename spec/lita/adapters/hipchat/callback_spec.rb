@@ -62,6 +62,12 @@ describe Lita::Adapters::HipChat::Callback do
       expect(robot).not_to receive(:receive)
       subject.private_message(client)
     end
+
+    it "skips the message if the body is nil" do
+      allow(jabber_message).to receive(:body).and_return(nil)
+      expect(robot).not_to receive(:receive)
+      subject.private_message(client)
+    end
   end
 
   describe "#muc_message" do
