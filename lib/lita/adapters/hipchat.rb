@@ -14,8 +14,8 @@ module Lita
         set_default_config_values
 
         @connector = Connector.new(
-          jid: config.jid,
-          password: config.password,
+          config.jid,
+          config.password,
           debug: config.debug
         )
       end
