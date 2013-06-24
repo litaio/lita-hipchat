@@ -31,6 +31,8 @@ Values for all of the following attributes can be found on the "XMPP/Jabber info
 
 **Note: You must set the robot's name to the value shown as "Room nickname" on the XMPP settings page.**
 
+There's no need to set `config.robot.mention_name` manually. The adapter will load the proper mention name from the XMPP roster upon connection.
+
 ### Example
 
 ``` ruby
