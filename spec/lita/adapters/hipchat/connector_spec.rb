@@ -35,13 +35,15 @@ describe Lita::Adapters::HipChat::Connector do
 
     before do
       allow(Jabber::Presence).to receive(:new).and_return(presence)
-      allow(Jabber::Roster::Helper).to receive(:new).with(client).and_return(
-        roster
-      )
+      allow(Jabber::Roster::Helper).to receive(:new).with(
+        client,
+        false
+      ).and_return(roster)
       allow(Lita::Adapters::HipChat::Callback).to receive(:new).and_return(
         callback
       )
       allow(callback).to receive(:private_message)
+      allow(callback).to receive(:roster_update)
       allow(robot).to receive(:mention_name=)
     end
 

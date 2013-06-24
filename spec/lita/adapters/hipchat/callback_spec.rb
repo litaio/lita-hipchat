@@ -4,22 +4,22 @@ describe Lita::Adapters::HipChat::Callback do
   subject { described_class.new(robot, roster) }
 
   let(:robot) { double("Lita::Robot") }
-  let(:roster_item) { double("Jabber::Roster::RosterItem", iname: "Carl") }
   let(:roster) do
     double("Jabber::Roster::Helper", items: { "user_id" => roster_item })
   end
   let(:user) { double("Lita::User", id: "user_id") }
   let(:source) { double("Lita::Source") }
   let(:message) { double("Lita::Message") }
+  let(:roster_item) do
+    double("Jabber::Roster::RosterItem", attributes: {
+      "jid" => "user_id",
+      "name" => "Carl",
+      "mention_name" => "@Carl"
+    }, iname: "Carl")
+  end
 
   before do
-    allow(roster).to receive(:[]).with("user_id").and_return(
-      double("Jabber::Roster::RosterItem", attributes: {
-        "jid" => "user_id",
-        "name" => "Carl",
-        "mention_name" => "@Carl"
-      })
-    )
+    allow(roster).to receive(:[]).with("user_id").and_return(roster_item)
     allow(Lita::User).to receive(:create).with(
       "user_id",
       name: "Carl",
@@ -90,6 +90,21 @@ describe Lita::Adapters::HipChat::Callback do
       ).and_return(message)
       expect(robot).to receive(:receive).with(message)
       subject.muc_message(muc)
+    end
+  end
+
+  describe "#roster_update" do
+    before do
+      allow(roster).to receive(:add_update_callback).and_yield(nil, roster_item)
+    end
+
+    it "finds/creates a user object for the roster item" do
+      expect(Lita::User).to receive(:create).with(
+        "user_id",
+        name: "Carl",
+        mention_name: "@Carl"
+      )
+      subject.roster_update
     end
   end
 end

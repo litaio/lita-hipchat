@@ -33,17 +33,27 @@ module Lita
           end
         end
 
+        def roster_update
+          roster.add_update_callback do |old_item, item|
+            jid = item.attributes["jid"]
+            Lita.logger.debug("Updating record for user with ID: #{jid}.")
+            create_user(item.attributes)
+          end
+        end
+
         private
 
-        def user_by_jid(jid)
-          Lita.logger.debug("Looking up user with JID: #{jid}.")
-          user_data = roster[jid].attributes
-
+        def create_user(user_data)
           User.create(
             user_data["jid"],
             name: user_data["name"],
             mention_name: user_data["mention_name"]
           )
+        end
+
+        def user_by_jid(jid)
+          Lita.logger.debug("Looking up user with JID: #{jid}.")
+          create_user(roster[jid].attributes)
         end
 
         def user_by_name(name)

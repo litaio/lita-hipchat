@@ -109,7 +109,9 @@ module Lita
 
         def load_roster
           Lita.logger.debug("Loading roster.")
-          @roster = Jabber::Roster::Helper.new(client)
+          @roster = Jabber::Roster::Helper.new(client, false)
+          Callback.new(robot, roster).roster_update
+          roster.get_roster
           roster.wait_for_roster
           robot.mention_name = roster[jid].attributes["mention_name"]
         end
