@@ -2,11 +2,13 @@ require "spec_helper"
 
 describe Lita::Adapters::HipChat do
   before do
-    Lita.config.adapter.jid = "jid"
-    Lita.config.adapter.password = "secret"
-    Lita.config.adapter.rooms = nil
-    Lita.config.adapter.muc_domain = nil
-    allow(Lita).to receive(:logger).and_return(double("Logger").as_null_object)
+    Lita.configure do |config|
+      config.adapter.jid = "jid"
+      config.adapter.password = "secret"
+      config.adapter.rooms = nil
+      config.adapter.muc_domain = nil
+    end
+
     allow(described_class::Connector).to receive(:new).and_return(connector)
   end
 
@@ -20,7 +22,7 @@ describe Lita::Adapters::HipChat do
   end
 
   it "requires config.jid and config.password" do
-    Lita.instance_variable_set(:@config, nil)
+    Lita.clear_config
     expect(Lita.logger).to receive(:fatal).with(/jid, password/)
     expect { subject }.to raise_error(SystemExit)
   end

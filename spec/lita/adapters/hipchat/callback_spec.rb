@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Lita::Adapters::HipChat::Callback do
+describe Lita::Adapters::HipChat::Callback, lita: true do
   subject { described_class.new(robot, roster) }
 
   let(:robot) { double("Lita::Robot") }

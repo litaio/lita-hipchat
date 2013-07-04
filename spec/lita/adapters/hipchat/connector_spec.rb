@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Lita::Adapters::HipChat::Connector do
+describe Lita::Adapters::HipChat::Connector, lita: true do
   subject { described_class.new(robot, "user", "secret") }
 
   let(:client) { double("Jabber::Client").as_null_object }
