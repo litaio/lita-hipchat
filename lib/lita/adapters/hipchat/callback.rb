@@ -58,8 +58,17 @@ module Lita
 
         def user_by_name(name)
           Lita.logger.debug("Looking up user with name: #{name}.")
-          jid = roster.items.detect { |jid, item| item.iname == name }.first
-          user_by_jid(jid)
+          items = roster.items.detect { |jid, item| item.iname == name }
+          if items
+            user_by_jid(items.first)
+          else
+            Lita.logger.warn <<-MSG
+No user with the name #{name.inspect} was found in the roster. The message may
+have been generated from the HipChat API. A temporary user has been created for
+this message, but Lita will not be able to reply.
+MSG
+            User.new(nil, name: name)
+          end
         end
       end
     end

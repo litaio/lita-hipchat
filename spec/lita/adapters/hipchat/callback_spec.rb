@@ -91,6 +91,22 @@ describe Lita::Adapters::HipChat::Callback, lita: true do
       expect(robot).to receive(:receive).with(message)
       subject.muc_message(muc)
     end
+
+    it "creates a temporary source user if the JID isn't in the roster" do
+      roster = double("Jabber::Roster::Helper", items: {})
+      allow(muc).to receive(:on_message).and_yield(nil, "Unknown", "foo")
+      allow(Lita::Source).to receive(:new).with(
+        an_instance_of(Lita::User),
+        "room_id"
+      ).and_return(source)
+      allow(Lita::Message).to receive(:new).with(
+        robot,
+        "foo",
+        source
+      ).and_return(message)
+      expect(robot).to receive(:receive).with(message)
+      subject.muc_message(muc)
+    end
   end
 
   describe "#roster_update" do
