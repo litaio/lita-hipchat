@@ -1,6 +1,6 @@
 # lita-hipchat
 
-[![Build Status](https://travis-ci.org/jimmycuadra/lita-hipchat.png)](https://travis-ci.org/jimmycuadra/lita-hipchat)
+[![Build Status](https://travis-ci.org/jimmycuadra/lita-hipchat.png?branch=master)](https://travis-ci.org/jimmycuadra/lita-hipchat)
 [![Code Climate](https://codeclimate.com/github/jimmycuadra/lita-hipchat.png)](https://codeclimate.com/github/jimmycuadra/lita-hipchat)
 [![Coverage Status](https://coveralls.io/repos/jimmycuadra/lita-hipchat/badge.png)](https://coveralls.io/r/jimmycuadra/lita-hipchat)
 
