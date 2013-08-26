@@ -4,3 +4,7 @@ rvm:
 script: bundle exec rspec
 before_install:
   - gem update --system
+notifications:
+  webhooks:
+    urls:
+      - https://lita-freenode.herokuapp.com/travis
