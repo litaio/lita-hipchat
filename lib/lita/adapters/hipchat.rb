@@ -23,6 +23,7 @@ module Lita
 
       def run
         connector.connect
+        robot.trigger(:connected)
         connector.join_rooms(config.muc_domain, rooms)
         sleep
       rescue Interrupt
@@ -43,6 +44,7 @@ module Lita
 
       def shut_down
         connector.shut_down
+        robot.trigger(:disconnected)
       end
 
       private

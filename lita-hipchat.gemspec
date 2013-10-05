@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-hipchat"
-  spec.version       = "1.0.1"
+  spec.version       = "1.2.0"
   spec.authors       = ["Jimmy Cuadra"]
   spec.email         = ["jimmy@jimmycuadra.com"]
   spec.description   = %q{A HipChat adapter for Lita.}
@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "lita", "~> 2.0"
+  spec.add_runtime_dependency "lita", "~> 2.5"
   spec.add_runtime_dependency "xmpp4r", "~> 0.5"
 
   spec.add_development_dependency "bundler", "~> 1.3"

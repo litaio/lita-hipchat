@@ -47,6 +47,10 @@ Lita.configure do |config|
 end
 ```
 
+## Events
+
+The HipChat adapter will trigger the `:connected` and `:disconnected` events when the robot has connected and disconnected from HipChat, respectively. There is no payload data for either event.
+
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)

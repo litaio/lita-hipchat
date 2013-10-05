@@ -30,12 +30,14 @@ describe Lita::Adapters::HipChat do
   describe "#run" do
     before do
       allow(subject.connector).to receive(:connect)
+      allow(robot).to receive(:trigger)
       allow(subject.connector).to receive(:join_rooms)
       allow(subject).to receive(:sleep)
     end
 
     it "connects to HipChat" do
       expect(subject.connector).to receive(:connect)
+      expect(robot).to receive(:trigger).with(:connected)
       subject.run
     end
 
@@ -115,6 +117,7 @@ describe Lita::Adapters::HipChat do
   describe "#shut_down" do
     it "shuts down the connector" do
       expect(subject.connector).to receive(:shut_down)
+      expect(robot).to receive(:trigger).with(:disconnected)
       subject.shut_down
     end
   end
