@@ -46,7 +46,7 @@ describe Lita::Adapters::HipChat::Callback, lita: true do
     end
 
     it "sends the message to the robot with the proper source and body" do
-      allow(Lita::Source).to receive(:new).with(user).and_return(source)
+      allow(Lita::Source).to receive(:new).with(user: user).and_return(source)
       allow(Lita::Message).to receive(:new).with(
         robot,
         "foo",
@@ -80,8 +80,8 @@ describe Lita::Adapters::HipChat::Callback, lita: true do
 
     it "sends the message to the robot with the proper source and body" do
       allow(Lita::Source).to receive(:new).with(
-        user,
-        "room_id"
+        user: user,
+        room: "room_id"
       ).and_return(source)
       allow(Lita::Message).to receive(:new).with(
         robot,
@@ -96,8 +96,8 @@ describe Lita::Adapters::HipChat::Callback, lita: true do
       roster = double("Jabber::Roster::Helper", items: {})
       allow(muc).to receive(:on_message).and_yield(nil, "Unknown", "foo")
       allow(Lita::Source).to receive(:new).with(
-        an_instance_of(Lita::User),
-        "room_id"
+        user: an_instance_of(Lita::User),
+        room: "room_id"
       ).and_return(source)
       allow(Lita::Message).to receive(:new).with(
         robot,
