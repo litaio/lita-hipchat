@@ -87,7 +87,7 @@ describe Lita::Adapters::HipChat do
 
   describe "#send_messages" do
     it "sends messages to rooms" do
-      source = double("Lita::Source", room: "room_id")
+      source = double("Lita::Source", room: "room_id", private_message?: false)
       expect(subject.connector).to receive(:message_muc).with(
         "room_id",
         ["Hello!"]
@@ -97,7 +97,7 @@ describe Lita::Adapters::HipChat do
 
     it "sends private messages to users" do
       user = double("Lita::User", id: "user_id")
-      source = double("Lita::Source", room: nil, user: user)
+      source = double("Lita::Source", user: user, private_message?: true)
       expect(subject.connector).to receive(:message_jid).with(
         "user_id",
         ["Hello!"]

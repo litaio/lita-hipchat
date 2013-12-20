@@ -31,10 +31,10 @@ module Lita
       end
 
       def send_messages(target, strings)
-        if target.room
-          connector.message_muc(target.room, strings)
-        else
+        if target.private_message?
           connector.message_jid(target.user.id, strings)
+        else
+          connector.message_muc(target.room, strings)
         end
       end
 
