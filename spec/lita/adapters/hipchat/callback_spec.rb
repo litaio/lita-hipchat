@@ -110,17 +110,19 @@ describe Lita::Adapters::HipChat::Callback, lita: true do
   end
 
   describe "#roster_update" do
-    before do
-      allow(roster).to receive(:add_update_callback).and_yield(nil, roster_item)
-    end
-
     it "finds/creates a user object for the roster item" do
+      allow(roster).to receive(:add_update_callback).and_yield(nil, roster_item)
       expect(Lita::User).to receive(:create).with(
         "user_id",
         name: "Carl",
         mention_name: "@Carl"
       )
       subject.roster_update
+    end
+
+    it "fails gracefully if the new item is nil" do
+      allow(roster).to receive(:add_update_callback).and_yield(nil, nil)
+      expect { subject.roster_update }.not_to raise_error
     end
   end
 end

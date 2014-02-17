@@ -35,6 +35,7 @@ module Lita
 
         def roster_update
           roster.add_update_callback do |old_item, item|
+            next unless item
             jid = item.attributes["jid"]
             Lita.logger.debug("Updating record for user with ID: #{jid}.")
             create_user(item.attributes)
