@@ -1,4 +1,3 @@
-require "lita/encoding_patches"
 require "lita/adapters/hipchat/callback"
 
 require "xmpp4r"
