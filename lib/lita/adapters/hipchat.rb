@@ -14,6 +14,14 @@ module Lita
         @connector = Connector.new(robot, config.jid, config.password, debug: debug)
       end
 
+      def join(room_id)
+        connector.join(muc_domain, room_id)
+      end
+
+      def part(room_id)
+        connector.part(muc_domain, room_id)
+      end
+
       def run
         connector.connect
         robot.trigger(:connected)

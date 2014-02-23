@@ -27,6 +27,20 @@ describe Lita::Adapters::HipChat do
     expect { subject }.to raise_error(SystemExit)
   end
 
+  describe "#join" do
+    it "joins a room" do
+      expect(subject.connector).to receive(:join).with("conf.hipchat.com", "#foo")
+      subject.join("#foo")
+    end
+  end
+
+  describe "#part" do
+    it "parts from a room" do
+      expect(subject.connector).to receive(:part).with("conf.hipchat.com", "#foo")
+      subject.part("#foo")
+    end
+  end
+
   describe "#run" do
     before do
       allow(subject.connector).to receive(:connect)

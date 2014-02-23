@@ -91,52 +91,45 @@ describe Lita::Adapters::HipChat::Connector, lita: true do
     end
   end
 
-  describe "#join rooms" do
-    let(:muc_domain) { "conf.hipchat.com" }
-    let(:rooms) { ["muc_1", "muc_2"] }
+  describe "#join" do
+    let(:muc) { instance_double("Jabber::MUC::SimpleMUCClient") }
     let(:callback) { instance_double("Lita::Adapters::HipChat::Callback") }
-    let(:roster) { instance_double("Jabber::Roster::Helper") }
-    let(:muc_1) do
-      muc = instance_double("Jabber::MUC::SimpleMUCClient")
-      allow(muc).to receive(:join)
-      muc
-    end
-
-    let(:muc_2) do
-      muc = instance_double("Jabber::MUC::SimpleMUCClient")
-      allow(muc).to receive(:join)
-      muc
-    end
 
     before do
-      allow(Jabber::MUC::SimpleMUCClient).to receive(:new).with(client).and_return(muc_1, muc_2)
+      allow(Jabber::MUC::SimpleMUCClient).to receive(:new).with(client).and_return(muc)
       allow(Lita::Adapters::HipChat::Callback).to receive(:new).and_return(callback)
       allow(callback).to receive(:muc_message)
-      allow(subject).to receive(:roster).and_return(roster)
+      allow(muc).to receive(:join)
     end
 
-    it "creates a SimpleMUCClient for each room" do
-      subject.join_rooms(muc_domain, rooms)
-      expect(subject.mucs).to eq(
-        "muc_1@conf.hipchat.com" => muc_1,
-        "muc_2@conf.hipchat.com" => muc_2,
-      )
+    it "stores a SimpleMUCClient for the room" do
+      subject.join("conf.hipchat.com", "foo")
+      expect(subject.mucs["foo@conf.hipchat.com"]).to eq(muc)
     end
 
-    it "registers a message callback for each room" do
-      expect(Lita::Adapters::HipChat::Callback).to receive(:new).with(
-        robot,
-        roster
-      ).and_return(callback)
-      expect(callback).to receive(:muc_message).with(muc_1)
-      expect(callback).to receive(:muc_message).with(muc_2)
-      subject.join_rooms(muc_domain, rooms)
+    it "registers a message callback" do
+      expect(callback).to receive(:muc_message).with(muc)
+      subject.join("conf.hipchat.com", "foo")
     end
+
+    it "joins the room" do
+      expect(muc).to receive(:join)
+      subject.join("conf.hipchat.com", "foo")
+    end
+
+    it "doesn't attempt to join a room it's already in" do
+      expect(callback).to receive(:muc_message).with(muc).once
+      expect(muc).to receive(:join).once
+      2.times { subject.join("conf.hipchat.com", "foo") }
+    end
+  end
+
+  describe "#join rooms" do
+    let(:rooms) { %w(foo bar) }
 
     it "joins each room" do
-      expect(muc_1).to receive(:join)
-      expect(muc_2).to receive(:join)
-      subject.join_rooms(muc_domain, rooms)
+      rooms.each { |room| expect(subject).to receive(:join).with("conf.hipchat.com", room) }
+      subject.join_rooms("conf.hipchat.com", rooms)
     end
   end
 
@@ -181,6 +174,21 @@ describe Lita::Adapters::HipChat::Connector, lita: true do
       expect(muc).to receive(:say).with("foo")
       expect(muc).to receive(:say).with("bar")
       subject.message_muc("jid", ["foo", "bar"])
+    end
+  end
+
+  describe "#part" do
+    let(:muc) { instance_double("Jabber::MUC::SimpleMUCClient") }
+
+    it "parts from a room" do
+      subject.mucs["#foo@conf.hipchat.com"] = muc
+      expect(muc).to receive(:exit)
+      subject.part("conf.hipchat.com", "#foo")
+    end
+
+    it "doesn't attempt to part from a room it's not in" do
+      expect(muc).not_to receive(:exit)
+      subject.part("conf.hipchat.com", "#foo")
     end
   end
 

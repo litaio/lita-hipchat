@@ -33,15 +33,21 @@ module Lita
           send_presence
         end
 
+        def join(muc_domain, room)
+          room_jid = normalized_jid(room, muc_domain, robot.name)
+          return if mucs[room_jid.bare.to_s]
+
+          muc = Jabber::MUC::SimpleMUCClient.new(client)
+          mucs[room_jid.bare.to_s] = muc
+
+          register_muc_message_callback(muc)
+
+          Lita.logger.info("Joining room: #{room_jid}.")
+          muc.join(room_jid)
+        end
+
         def join_rooms(muc_domain, rooms)
-          rooms.each do |room_name|
-            muc = Jabber::MUC::SimpleMUCClient.new(client)
-            room_jid = normalized_jid(room_name, muc_domain, robot.name)
-            mucs[room_jid.bare.to_s] = muc
-            register_muc_message_callback(muc)
-            Lita.logger.info("Joining room: #{room_jid}.")
-            muc.join(room_jid)
-          end
+          rooms.each { |room| join(muc_domain, room) }
         end
 
         def list_rooms(muc_domain)
@@ -69,6 +75,12 @@ module Lita
 
         def mucs
           @mucs ||= {}
+        end
+
+        def part(muc_domain, room)
+          room_jid = normalized_jid(room, muc_domain, robot.name)
+          muc = mucs[room_jid.bare.to_s]
+          muc.exit if muc
         end
 
         def set_topic(room_jid, topic)
