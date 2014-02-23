@@ -11,20 +11,13 @@ module Lita
       def initialize(robot)
         super
 
-        set_default_config_values
-
-        @connector = Connector.new(
-          robot,
-          config.jid,
-          config.password,
-          debug: config.debug
-        )
+        @connector = Connector.new(robot, config.jid, config.password, debug: debug)
       end
 
       def run
         connector.connect
         robot.trigger(:connected)
-        connector.join_rooms(config.muc_domain, rooms)
+        connector.join_rooms(muc_domain, rooms)
         sleep
       rescue Interrupt
         shut_down
@@ -53,17 +46,20 @@ module Lita
         Lita.config.adapter
       end
 
+      def debug
+        config.debug || false
+      end
+
+      def muc_domain
+        config.muc_domain || "conf.hipchat.com"
+      end
+
       def rooms
         if config.rooms == :all
-          connector.list_rooms(config.muc_domain)
+          connector.list_rooms(muc_domain)
         else
           Array(config.rooms)
         end
-      end
-
-      def set_default_config_values
-        config.debug = false if config.debug.nil?
-        config.muc_domain = "conf.hipchat.com" if config.muc_domain.nil?
       end
     end
 
