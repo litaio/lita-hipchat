@@ -14,15 +14,15 @@ describe Lita::Adapters::HipChat do
 
   subject { described_class.new(robot) }
 
-  let(:robot) { double("Lita::Robot") }
-  let(:connector) { double("Lita::Adapters::HipChat::Connector") }
+  let(:robot) { instance_double("Lita::Robot") }
+  let(:connector) { instance_double("Lita::Adapters::HipChat::Connector") }
 
   it "registers with Lita" do
     expect(Lita.adapters[:hipchat]).to eql(described_class)
   end
 
   it "requires config.jid and config.password" do
-    Lita.clear_config
+    Lita.config.adapter.jid = Lita.config.adapter.password = nil
     expect(Lita.logger).to receive(:fatal).with(/jid, password/)
     expect { subject }.to raise_error(SystemExit)
   end
@@ -43,33 +43,22 @@ describe Lita::Adapters::HipChat do
 
     it "joins rooms with a custom muc_domain" do
       Lita.config.adapter.muc_domain = "foo.bar.com"
-      expect(subject.connector).to receive(:join_rooms).with(
-        "foo.bar.com",
-        anything
-      )
+      expect(subject.connector).to receive(:join_rooms).with("foo.bar.com", anything)
       subject.run
     end
 
     it "joins all rooms when config.rooms is :all" do
-      all_rooms = ["room_1_id", "room_2_id"]
+      rooms = ["room_1_id", "room_2_id"]
       Lita.config.adapter.rooms = :all
-      allow(subject.connector).to receive(:list_rooms).with(
-        "conf.hipchat.com"
-      ).and_return(all_rooms)
-      expect(subject.connector).to receive(:join_rooms).with(
-        "conf.hipchat.com",
-        all_rooms
-      )
+      allow(subject.connector).to receive(:list_rooms).with("conf.hipchat.com").and_return(rooms)
+      expect(subject.connector).to receive(:join_rooms).with("conf.hipchat.com", rooms)
       subject.run
     end
 
     it "joins rooms specified by config.rooms" do
       custom_rooms = ["my_room_1_id", "my_room_2_id"]
       Lita.config.adapter.rooms = custom_rooms
-      expect(subject.connector).to receive(:join_rooms).with(
-        "conf.hipchat.com",
-        custom_rooms
-      )
+      expect(subject.connector).to receive(:join_rooms).with("conf.hipchat.com",custom_rooms)
       subject.run
     end
 
@@ -87,28 +76,22 @@ describe Lita::Adapters::HipChat do
 
   describe "#send_messages" do
     it "sends messages to rooms" do
-      source = double("Lita::Source", room: "room_id", private_message?: false)
-      expect(subject.connector).to receive(:message_muc).with(
-        "room_id",
-        ["Hello!"]
-      )
+      source = instance_double("Lita::Source", room: "room_id", private_message?: false)
+      expect(subject.connector).to receive(:message_muc).with("room_id", ["Hello!"])
       subject.send_messages(source, ["Hello!"])
     end
 
     it "sends private messages to users" do
-      user = double("Lita::User", id: "user_id")
-      source = double("Lita::Source", user: user, private_message?: true)
-      expect(subject.connector).to receive(:message_jid).with(
-        "user_id",
-        ["Hello!"]
-      )
+      user = instance_double("Lita::User", id: "user_id")
+      source = instance_double("Lita::Source", user: user, private_message?: true)
+      expect(subject.connector).to receive(:message_jid).with("user_id", ["Hello!"])
       subject.send_messages(source, ["Hello!"])
     end
   end
 
   describe "#set_topic" do
     it "sets a new topic for a room" do
-      source = double("Lita::Source", room: "room_id")
+      source = instance_double("Lita::Source", room: "room_id")
       expect(subject.connector).to receive(:set_topic).with("room_id", "Topic")
       subject.set_topic(source, "Topic")
     end
