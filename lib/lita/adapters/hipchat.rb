@@ -59,7 +59,7 @@ module Lita
       end
 
       def muc_domain
-        config.muc_domain || "conf.hipchat.com"
+        config.muc_domain.nil? ? "conf.hipchat.com" : config.muc_domain.dup
       end
 
       def rooms
