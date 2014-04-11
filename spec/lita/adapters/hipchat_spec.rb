@@ -34,6 +34,12 @@ describe Lita::Adapters::HipChat do
     end
   end
 
+  describe "#mention_format" do
+    it "returns the name prefixed with an @" do
+      expect(subject.mention_format("carl")).to eq("@carl")
+    end
+  end
+
   describe "#part" do
     it "parts from a room" do
       expect(subject.connector).to receive(:part).with("conf.hipchat.com", "#foo")

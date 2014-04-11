@@ -18,6 +18,10 @@ module Lita
         connector.join(muc_domain, room_id)
       end
 
+      def mention_format(name)
+        "@#{name}"
+      end
+
       def part(room_id)
         connector.part(muc_domain, room_id)
       end
