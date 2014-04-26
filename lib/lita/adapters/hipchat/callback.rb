@@ -64,7 +64,7 @@ module Lita
           if items
             user_by_jid(items.first)
           elsif !Lita.config.adapter.ignore_unknown_users
-            Lita.logger.warn <<-MSG
+            Lita.logger.warn <<-MSG.chomp
 No user with the name #{name.inspect} was found in the roster. The message may
 have been generated from the HipChat API. A temporary user has been created for
 this message, but Lita will not be able to reply.
