@@ -92,6 +92,13 @@ describe Lita::Adapters::HipChat::Callback, lita: true do
       expect(robot).to receive(:receive).with(message)
       subject.muc_message(muc)
     end
+
+    it "ignores messages from unknown users if the config for it is set" do
+      Lita.config.adapter.ignore_unknown_users = true
+      allow(muc).to receive(:on_message).and_yield(nil, "Unknown", "foo")
+      expect(robot).not_to receive(:receive)
+      subject.muc_message(muc)
+    end
   end
 
   describe "#roster_update" do
