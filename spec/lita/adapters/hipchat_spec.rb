@@ -31,7 +31,7 @@ describe Lita::Adapters::HipChat do
   describe "#join" do
     let(:room) { "#foo" }
     before do
-      allow(robot).to receive(:trigger).with(:joined, :room => room)
+      allow(robot).to receive(:trigger).with(:joined, room: room)
     end
     it "joins a room" do
       expect(subject.connector).to receive(:join).with(domain, room)
@@ -46,9 +46,9 @@ describe Lita::Adapters::HipChat do
   end
 
   describe "#part" do
-    let(:room) { "#foo"}
+    let(:room) { "#foo" }
     before do
-      allow(robot).to receive(:trigger).with(:parted, :room => room)
+      allow(robot).to receive(:trigger).with(:parted, room: room)
     end
     it "parts from a room" do
       expect(subject.connector).to receive(:part).with(domain, room)

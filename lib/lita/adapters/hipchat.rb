@@ -15,7 +15,7 @@ module Lita
 
       def join(room_id)
         connector.join(muc_domain, room_id)
-        robot.trigger(:joined, :room => room_id)
+        robot.trigger(:joined, room: room_id)
       end
 
       def mention_format(name)
@@ -23,7 +23,7 @@ module Lita
       end
 
       def part(room_id)
-        robot.trigger(:parted, :room => room_id)
+        robot.trigger(:parted, room: room_id)
         connector.part(muc_domain, room_id)
       end
 
@@ -54,6 +54,8 @@ module Lita
         robot.trigger(:disconnected)
       end
 
+      private
+
       def rooms
         if config.rooms == :all
           connector.list_rooms(muc_domain)
@@ -61,8 +63,6 @@ module Lita
           Array(config.rooms)
         end
       end
-
-      private
 
       def config
         Lita.config.adapter
