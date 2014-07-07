@@ -50,7 +50,10 @@ end
 
 ## Events
 
-The HipChat adapter will trigger the `:connected` and `:disconnected` events when the robot has connected and disconnected from HipChat, respectively. There is no payload data for either event.
+`:connected` - When the robot has connected to HipChat. No payload.
+`:disconnected` - When the robot has disconnected from HipChat. No payload.
+`:joined` - When the robot joins a room. Payload: `:room`: The String room ID that was joined.
+`:parted` - When the robot parts from a room. Payload: `:room`: The String room ID that was parted from.
 
 ## License
 
