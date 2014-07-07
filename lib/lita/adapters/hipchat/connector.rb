@@ -35,7 +35,10 @@ module Lita
 
         def join(muc_domain, room)
           room_jid = normalized_jid(room, muc_domain, robot.name)
-          return if mucs[room_jid.bare.to_s]
+          if mucs[room_jid.bare.to_s]
+            Lita.logger.debug "Already in room with JID #{room_jid.bare.to_s}"
+            return
+          end
 
           muc = Jabber::MUC::SimpleMUCClient.new(client)
           mucs[room_jid.bare.to_s] = muc
