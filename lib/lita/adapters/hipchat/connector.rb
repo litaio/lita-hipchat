@@ -82,7 +82,7 @@ module Lita
 
         def part(muc_domain, room)
           room_jid = normalized_jid(room, muc_domain, robot.name)
-          muc = mucs[room_jid.bare.to_s]
+          muc = mucs.delete(room_jid.bare.to_s)
           muc.exit if muc
         end
 
