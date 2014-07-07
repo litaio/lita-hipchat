@@ -10,12 +10,12 @@ module Lita
 
       def initialize(robot)
         super
-
         @connector = Connector.new(robot, config.jid, config.password, debug: debug)
       end
 
       def join(room_id)
         connector.join(muc_domain, room_id)
+        robot.trigger(:joined, room: room_id)
       end
 
       def mention_format(name)
@@ -23,13 +23,14 @@ module Lita
       end
 
       def part(room_id)
+        robot.trigger(:parted, room: room_id)
         connector.part(muc_domain, room_id)
       end
 
       def run
         connector.connect
         robot.trigger(:connected)
-        connector.join_rooms(muc_domain, rooms)
+        rooms.each { |r| join(r) }
         sleep
       rescue Interrupt
         shut_down
@@ -48,11 +49,20 @@ module Lita
       end
 
       def shut_down
+        rooms.each { |r| part(r) }
         connector.shut_down
         robot.trigger(:disconnected)
       end
 
       private
+
+      def rooms
+        if config.rooms == :all
+          connector.list_rooms(muc_domain)
+        else
+          Array(config.rooms)
+        end
+      end
 
       def config
         Lita.config.adapter
@@ -66,13 +76,6 @@ module Lita
         config.muc_domain.nil? ? "conf.hipchat.com" : config.muc_domain.dup
       end
 
-      def rooms
-        if config.rooms == :all
-          connector.list_rooms(muc_domain)
-        else
-          Array(config.rooms)
-        end
-      end
     end
 
     Lita.register_adapter(:hipchat, HipChat)

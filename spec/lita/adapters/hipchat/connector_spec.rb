@@ -5,6 +5,7 @@ describe Lita::Adapters::HipChat::Connector, lita: true do
 
   let(:client) do
     client = instance_double("Jabber::Client")
+    allow(robot).to  receive(:trigger)
     allow(client).to receive(:auth)
     allow(client).to receive(:connect)
     allow(client).to receive(:send)

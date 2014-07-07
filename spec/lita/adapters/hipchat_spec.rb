@@ -16,6 +16,7 @@ describe Lita::Adapters::HipChat do
 
   let(:robot) { instance_double("Lita::Robot") }
   let(:connector) { instance_double("Lita::Adapters::HipChat::Connector") }
+  let(:domain) { "conf.hipchat.com" }
 
   it "registers with Lita" do
     expect(Lita.adapters[:hipchat]).to eql(described_class)
@@ -28,9 +29,13 @@ describe Lita::Adapters::HipChat do
   end
 
   describe "#join" do
+    let(:room) { "#foo" }
+    before do
+      allow(robot).to receive(:trigger).with(:joined, room: room)
+    end
     it "joins a room" do
-      expect(subject.connector).to receive(:join).with("conf.hipchat.com", "#foo")
-      subject.join("#foo")
+      expect(subject.connector).to receive(:join).with(domain, room)
+      subject.join(room)
     end
   end
 
@@ -41,17 +46,23 @@ describe Lita::Adapters::HipChat do
   end
 
   describe "#part" do
+    let(:room) { "#foo" }
+    before do
+      allow(robot).to receive(:trigger).with(:parted, room: room)
+    end
     it "parts from a room" do
-      expect(subject.connector).to receive(:part).with("conf.hipchat.com", "#foo")
-      subject.part("#foo")
+      expect(subject.connector).to receive(:part).with(domain, room)
+      subject.part(room)
     end
   end
 
   describe "#run" do
+    let(:rooms) { ["room_1_id", "room_2_id"] }
+
     before do
       allow(subject.connector).to receive(:connect)
       allow(robot).to receive(:trigger)
-      allow(subject.connector).to receive(:join_rooms)
+      allow(subject.connector).to receive(:join)
       allow(subject).to receive(:sleep)
     end
 
@@ -61,24 +72,31 @@ describe Lita::Adapters::HipChat do
       subject.run
     end
 
-    it "joins rooms with a custom muc_domain" do
-      Lita.config.adapter.muc_domain = "foo.bar.com"
-      expect(subject.connector).to receive(:join_rooms).with("foo.bar.com", anything)
-      subject.run
+    context "with a custom domain" do
+      let(:domain) { "foo.bar.com" }
+      it "joins rooms with a custom muc_domain" do
+        Lita.config.adapter.muc_domain = domain
+        allow(subject).to receive(:rooms).and_return(rooms)
+        expect(subject.connector).to receive(:join).with(domain, anything)
+        subject.run
+      end
     end
 
     it "joins all rooms when config.rooms is :all" do
-      rooms = ["room_1_id", "room_2_id"]
       Lita.config.adapter.rooms = :all
-      allow(subject.connector).to receive(:list_rooms).with("conf.hipchat.com").and_return(rooms)
-      expect(subject.connector).to receive(:join_rooms).with("conf.hipchat.com", rooms)
+      allow(subject.connector).to receive(:list_rooms).with(domain).and_return(rooms)
+      rooms.each do |room|
+        expect(subject).to receive(:join).with(room)
+      end
       subject.run
     end
 
     it "joins rooms specified by config.rooms" do
-      custom_rooms = ["my_room_1_id", "my_room_2_id"]
+      custom_rooms = rooms
       Lita.config.adapter.rooms = custom_rooms
-      expect(subject.connector).to receive(:join_rooms).with("conf.hipchat.com",custom_rooms)
+      rooms.each do |room|
+        expect(subject).to receive(:join).with(room)
+      end
       subject.run
     end
 
