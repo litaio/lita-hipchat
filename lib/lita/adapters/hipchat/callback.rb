@@ -24,7 +24,7 @@ module Lita
         def muc_message(muc)
           muc.on_message do |time, nick, text|
             user = user_by_name(nick)
-            return unless user
+            next unless user
             source = Source.new(user: user, room: muc.jid.bare.to_s)
             message = Message.new(robot, text, source)
             Lita.logger.debug(
