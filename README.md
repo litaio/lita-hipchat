@@ -40,11 +40,11 @@ There's no need to set `config.robot.mention_name` manually. The adapter will lo
 Lita.configure do |config|
   config.robot.name = "Lita Bot"
   config.robot.adapter = :hipchat
-  config.adapter.jid = "12345_123456@chat.hipchat.com"
-  config.adapter.password = "secret"
-  config.adapter.debug = false
-  config.adapter.rooms = :all
-  config.adapter.muc_domain = "conf.hipchat.com"
+  config.adapters.hipchat.jid = "12345_123456@chat.hipchat.com"
+  config.adapters.hipchat.password = "secret"
+  config.adapters.hipchat.debug = true
+  config.adapters.hipchat.rooms = :all
+  config.adapters.hipchat.muc_domain = "conf.hipchat.com"
 end
 ```
 

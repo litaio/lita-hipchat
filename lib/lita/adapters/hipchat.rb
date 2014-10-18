@@ -4,13 +4,23 @@ require "lita/adapters/hipchat/connector"
 module Lita
   module Adapters
     class HipChat < Adapter
-      require_configs :jid, :password
+      namespace "hipchat"
+
+      # Required attributes
+      config :jid, type: String, required: true
+      config :password, type: String, required: true
+
+      # Optional attributes
+      config :debug, type: [TrueClass, FalseClass], default: false
+      config :rooms, type: [Symbol, Array]
+      config :muc_domain, type: String, default: "conf.hipchat.com"
+      config :ignore_unknown_users, type: [TrueClass, FalseClass], default: false
 
       attr_reader :connector
 
       def initialize(robot)
         super
-        @connector = Connector.new(robot, config.jid, config.password, debug: debug)
+        @connector = Connector.new(robot, config.jid, config.password, debug: config.debug)
       end
 
       def join(room_id)
@@ -64,16 +74,8 @@ module Lita
         end
       end
 
-      def config
-        Lita.config.adapter
-      end
-
-      def debug
-        config.debug || false
-      end
-
       def muc_domain
-        config.muc_domain.nil? ? "conf.hipchat.com" : config.muc_domain.dup
+        config.muc_domain.dup
       end
 
     end
