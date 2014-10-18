@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-hipchat"
-  spec.version       = "1.6.2"
+  spec.version       = "2.0.0"
   spec.authors       = ["Jimmy Cuadra"]
   spec.email         = ["jimmy@jimmycuadra.com"]
   spec.description   = %q{A HipChat adapter for Lita.}
