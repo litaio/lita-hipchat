@@ -11,6 +11,7 @@ module Lita
       config :password, type: String, required: true
 
       # Optional attributes
+      config :server, type: String, default: "chat.hipchat.com"
       config :debug, type: [TrueClass, FalseClass], default: false
       config :rooms, type: [Symbol, Array]
       config :muc_domain, type: String, default: "conf.hipchat.com"
@@ -20,7 +21,7 @@ module Lita
 
       def initialize(robot)
         super
-        @connector = Connector.new(robot, config.jid, config.password, debug: config.debug)
+        @connector = Connector.new(robot, config.jid, config.password, config.server, debug: config.debug)
       end
 
       def join(room_id)

@@ -25,6 +25,7 @@ Values for all of the following attributes can be found on the "XMPP/Jabber info
 
 ### Optional attributes
 
+* `server` (String) - The HipChat Server address. If specified, adapter tries to connect to it instead of chat.hipchat.com. Default: `"chat.hipchat.com"`
 * `debug` (Boolean) - If `true`, turns on the underlying Jabber library's (xmpp4r) logger, which is fairly verbose. Default: `false`.
 * `rooms` (Symbol, Array<String>) - An array of room JIDs that Lita should join upon connection. Can also be the symbol `:all`, which will cause Lita to discover and join all rooms. Default: `nil` (no rooms).
 * `muc_domain` (String) - The XMPP Multi-User Chat domain to use. Default: `"conf.hipchat.com"`.
