@@ -63,10 +63,7 @@ module Lita
         def message_jid(user_jid, strings)
           strings.each do |s|
             Lita.logger.debug("Sending message to JID #{user_jid}: #{s}")
-            message = Jabber::Message.new(user_jid,
-                                          s.encode('UTF-8',
-                                                   :invalid => :replace,
-                                                   :undef => :replace))
+            message = Jabber::Message.new(user_jid, encode_string(s))
             message.type = :chat
             client.send(message)
           end
@@ -76,7 +73,7 @@ module Lita
           muc = mucs[room_jid]
           strings.each do |s|
             Lita.logger.debug("Sending message to MUC #{room_jid}: #{s}")
-            muc.say(s.encode('UTF-8', :invalid => :replace, :undef => :replace))
+            muc.say(encode_string(s))
           end if muc
         end
 
@@ -142,6 +139,10 @@ module Lita
             jid.domain = domain
           end
           jid
+        end
+
+        def encode_string(s)
+          s.encode('UTF-8', :invalid => :replace, :undef => :replace)
         end
       end
     end
