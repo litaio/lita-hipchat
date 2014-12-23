@@ -24,7 +24,7 @@ module Lita
         def muc_message(muc)
           muc.on_message do |time, nick, text|
             user = user_by_name(nick)
-            return unless user
+            next unless user
             source = Source.new(user: user, room: muc.jid.bare.to_s)
             message = Message.new(robot, text, source)
             Lita.logger.debug(
@@ -63,7 +63,7 @@ module Lita
           items = roster.items.detect { |jid, item| item.iname == name }
           if items
             user_by_jid(items.first)
-          elsif !Lita.config.adapter.ignore_unknown_users
+          elsif !robot.config.adapters.hipchat.ignore_unknown_users
             Lita.logger.warn <<-MSG.chomp
 No user with the name #{name.inspect} was found in the roster. The message may
 have been generated from the HipChat API. A temporary user has been created for

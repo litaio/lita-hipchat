@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Lita::Adapters::HipChat::Connector, lita: true do
-  subject { described_class.new(robot, "user", "secret") }
+  subject { described_class.new(robot, "user", "secret", "chat.hipchat.com") }
 
   let(:client) do
     client = instance_double("Jabber::Client")
@@ -17,23 +17,23 @@ describe Lita::Adapters::HipChat::Connector, lita: true do
   before { allow(subject).to receive(:client).and_return(client) }
 
   it "sets the JID properly when only a node is supplied" do
-    subject = described_class.new(robot, "user", "secret")
+    subject = described_class.new(robot, "user", "secret", "chat.hipchat.com")
     expect(subject.jid).to eq("user@chat.hipchat.com/bot")
   end
 
   it "sets the JID properly when a node and domain are supplied" do
-    subject = described_class.new(robot, "user@example.com", "secret")
+    subject = described_class.new(robot, "user@example.com", "secret", "chat.hipchat.com")
     expect(subject.jid).to eq("user@example.com/bot")
   end
 
   it "sets the JID properly when a resource is supplied" do
-    subject = described_class.new(robot, "user@example.com/wrong", "secret")
+    subject = described_class.new(robot, "user@example.com/wrong", "secret", "chat.hipchat.com")
     expect(subject.jid).to eq("user@example.com/bot")
   end
 
   it "turns on the xmpp4r logger if debug: true is supplied" do
     expect(Jabber).to receive(:debug=).with(true)
-    subject = described_class.new(robot, "user", "secret", debug: true)
+    subject = described_class.new(robot, "user", "secret", "chat.hipchat.com", debug: true)
   end
 
   describe "#connect" do
@@ -57,7 +57,14 @@ describe Lita::Adapters::HipChat::Connector, lita: true do
     end
 
     it "connects to HipChat" do
-      expect(subject.client).to receive(:connect)
+      expect(subject.client).to receive(:connect).with("chat.hipchat.com")
+      subject.connect
+    end
+
+    it "connects to HipChat Server" do
+      subject = described_class.new(robot, "user", "secret", "hipchat.example.com")
+      allow(subject).to receive(:client).and_return(client)
+      expect(subject.client).to receive(:connect).with("hipchat.example.com")
       subject.connect
     end
 

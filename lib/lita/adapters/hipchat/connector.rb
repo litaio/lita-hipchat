@@ -11,10 +11,11 @@ module Lita
       class Connector
         attr_reader :robot, :client, :roster
 
-        def initialize(robot, jid, password, debug: false)
+        def initialize(robot, jid, password, server, debug: false)
           @robot = robot
           @jid = normalized_jid(jid, "chat.hipchat.com", "bot")
           @password = password
+          @server = server
           @client = Jabber::Client.new(@jid)
           if debug
             Lita.logger.info("Enabling Jabber log.")
@@ -111,7 +112,7 @@ module Lita
 
         def client_connect
           Lita.logger.info("Connecting to HipChat.")
-          client.connect
+          client.connect(@server)
           Lita.logger.debug("Authenticating with HipChat.")
           client.auth(@password)
         end

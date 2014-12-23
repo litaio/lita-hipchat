@@ -25,6 +25,7 @@ Values for all of the following attributes can be found on the "XMPP/Jabber info
 
 ### Optional attributes
 
+* `server` (String) - The HipChat Server address. Override this with the full domain of your server if using a private HipChat Server installation. Default: `"chat.hipchat.com"`
 * `debug` (Boolean) - If `true`, turns on the underlying Jabber library's (xmpp4r) logger, which is fairly verbose. Default: `false`.
 * `rooms` (Symbol, Array<String>) - An array of room JIDs that Lita should join upon connection. Can also be the symbol `:all`, which will cause Lita to discover and join all rooms. Default: `nil` (no rooms).
 * `muc_domain` (String) - The XMPP Multi-User Chat domain to use. Default: `"conf.hipchat.com"`.
@@ -40,11 +41,10 @@ There's no need to set `config.robot.mention_name` manually. The adapter will lo
 Lita.configure do |config|
   config.robot.name = "Lita Bot"
   config.robot.adapter = :hipchat
-  config.adapter.jid = "12345_123456@chat.hipchat.com"
-  config.adapter.password = "secret"
-  config.adapter.debug = false
-  config.adapter.rooms = :all
-  config.adapter.muc_domain = "conf.hipchat.com"
+  config.adapters.hipchat.jid = "12345_123456@chat.hipchat.com"
+  config.adapters.hipchat.password = "secret"
+  config.adapters.hipchat.debug = true
+  config.adapters.hipchat.rooms = :all
 end
 ```
 

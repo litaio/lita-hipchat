@@ -3,7 +3,12 @@ require "spec_helper"
 describe Lita::Adapters::HipChat::Callback, lita: true do
   subject { described_class.new(robot, roster) }
 
-  let(:robot) { instance_double("Lita::Robot") }
+  prepend_before { registry.register_adapter(:hipchat, Lita::Adapters::HipChat) }
+
+  let(:registry) { Lita::Registry.new }
+  let(:robot) do
+    instance_double("Lita::Robot", mention_name: "Lita", alias: nil, config: registry.config)
+  end
   let(:roster) do
     instance_double("Jabber::Roster::Helper", items: { "user_id" => roster_item })
   end
@@ -94,7 +99,7 @@ describe Lita::Adapters::HipChat::Callback, lita: true do
     end
 
     it "ignores messages from unknown users if the config for it is set" do
-      Lita.config.adapter.ignore_unknown_users = true
+      registry.config.adapters.hipchat.ignore_unknown_users = true
       allow(muc).to receive(:on_message).and_yield(nil, "Unknown", "foo")
       expect(robot).not_to receive(:receive)
       subject.muc_message(muc)

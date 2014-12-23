@@ -1,12 +1,12 @@
 require "spec_helper"
 
-describe Lita::Adapters::HipChat do
+describe Lita::Adapters::HipChat, lita: true do
   before do
-    Lita.configure do |config|
-      config.adapter.jid = "jid"
-      config.adapter.password = "secret"
-      config.adapter.rooms = nil
-      config.adapter.muc_domain = nil
+    registry.register_adapter(:hipchat, described_class)
+
+    registry.configure do |config|
+      config.adapters.hipchat.jid = "jid"
+      config.adapters.hipchat.password = "secret"
     end
 
     allow(described_class::Connector).to receive(:new).and_return(connector)
@@ -14,18 +14,12 @@ describe Lita::Adapters::HipChat do
 
   subject { described_class.new(robot) }
 
-  let(:robot) { instance_double("Lita::Robot") }
+  let(:robot) { Lita::Robot.new(registry) }
   let(:connector) { instance_double("Lita::Adapters::HipChat::Connector") }
   let(:domain) { "conf.hipchat.com" }
 
   it "registers with Lita" do
     expect(Lita.adapters[:hipchat]).to eql(described_class)
-  end
-
-  it "requires config.jid and config.password" do
-    Lita.config.adapter.jid = Lita.config.adapter.password = nil
-    expect(Lita.logger).to receive(:fatal).with(/jid, password/)
-    expect { subject }.to raise_error(SystemExit)
   end
 
   describe "#join" do
@@ -75,7 +69,7 @@ describe Lita::Adapters::HipChat do
     context "with a custom domain" do
       let(:domain) { "foo.bar.com" }
       it "joins rooms with a custom muc_domain" do
-        Lita.config.adapter.muc_domain = domain
+        registry.config.adapters.hipchat.muc_domain = domain
         allow(subject).to receive(:rooms).and_return(rooms)
         expect(subject.connector).to receive(:join).with(domain, anything)
         subject.run
@@ -83,7 +77,7 @@ describe Lita::Adapters::HipChat do
     end
 
     it "joins all rooms when config.rooms is :all" do
-      Lita.config.adapter.rooms = :all
+      registry.config.adapters.hipchat.rooms = :all
       allow(subject.connector).to receive(:list_rooms).with(domain).and_return(rooms)
       rooms.each do |room|
         expect(subject).to receive(:join).with(room)
@@ -93,7 +87,7 @@ describe Lita::Adapters::HipChat do
 
     it "joins rooms specified by config.rooms" do
       custom_rooms = rooms
-      Lita.config.adapter.rooms = custom_rooms
+      registry.config.adapters.hipchat.rooms = custom_rooms
       rooms.each do |room|
         expect(subject).to receive(:join).with(room)
       end
@@ -138,6 +132,8 @@ describe Lita::Adapters::HipChat do
   describe "#shut_down" do
     it "shuts down the connector" do
       expect(subject.connector).to receive(:shut_down)
+      allow(robot).to receive(:trigger)
+      allow(subject.connector).to receive(:part)
       expect(robot).to receive(:trigger).with(:disconnected)
       subject.shut_down
     end
