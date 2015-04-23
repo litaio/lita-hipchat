@@ -104,6 +104,12 @@ describe Lita::Adapters::HipChat, lita: true do
       allow(subject).to receive(:sleep).and_raise(Interrupt)
       subject.run
     end
+
+    it "disconnects gracefully on connection reset" do
+      expect(subject).to receive(:shut_down)
+      allow(subject).to receive(:sleep).and_raise(Errno::ECONNRESET)
+      subject.run
+    end
   end
 
   describe "#send_messages" do
