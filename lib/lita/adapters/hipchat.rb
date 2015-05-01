@@ -1,5 +1,6 @@
 require "lita"
 require "lita/adapters/hipchat/connector"
+require "lita/adapters/hipchat/user"
 
 module Lita
   module Adapters
