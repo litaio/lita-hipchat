@@ -9,6 +9,7 @@ describe Lita::Adapters::HipChat::Connector, lita: true do
     allow(client).to receive(:auth)
     allow(client).to receive(:connect)
     allow(client).to receive(:send)
+    allow(client).to receive(:on_exception)
     client
   end
 
@@ -95,6 +96,11 @@ describe Lita::Adapters::HipChat::Connector, lita: true do
 
     it "assigns the robot's mention_name with info from the roster" do
       expect(robot).to receive(:mention_name=).with("LitaBot")
+      subject.connect
+    end
+
+    it "registers an error handler with the XMPP client" do
+      expect(client).to receive(:on_exception)
       subject.connect
     end
   end

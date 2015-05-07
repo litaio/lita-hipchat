@@ -28,6 +28,7 @@ module Lita
         end
 
         def connect
+          register_exception_handler
           client_connect
           load_roster
           register_message_callback
@@ -112,6 +113,12 @@ module Lita
           client.connect(@server)
           Lita.logger.debug("Authenticating with HipChat.")
           client.auth(@password)
+        end
+
+        def register_exception_handler
+          client.on_exception do |error, connection, error_source|
+            robot.shut_down
+          end
         end
 
         def register_message_callback
