@@ -43,9 +43,6 @@ module Lita
         robot.trigger(:connected)
         rooms.each { |r| join(r) }
         sleep
-      rescue Errno::ECONNRESET => e
-        Lita.logger.error(e)
-        shut_down
       rescue Interrupt
         shut_down
       end
