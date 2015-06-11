@@ -33,6 +33,43 @@ describe Lita::Adapters::HipChat, lita: true do
     end
   end
 
+  describe "#join_persisted_rooms" do
+    it "attempts to join persisted_rooms" do
+      expect(robot).to receive(:respond_to?).and_return(true)
+      expect(robot).to receive(:persisted_rooms).twice.and_return(["room_3_id", "room_4_id"])
+      expect(subject).to receive(:join).twice
+      subject.join_persisted_rooms(robot)
+    end
+
+    it "handles bad room names well" do
+      expect(robot).to receive(:respond_to?).and_return(true)
+      expect(robot).to receive(:persisted_rooms).twice.and_return(["bad_room_id"])
+      expect(subject).to receive(:join).with("bad_room_id").and_raise("foobar")
+      expect { subject.join_persisted_rooms(robot) }.to_not raise_exception
+    end
+
+    it "handles empty persisted_rooms well" do
+      expect(robot).to receive(:respond_to?).and_return(true)
+      expect(robot).to receive(:persisted_rooms).twice.and_return([])
+      expect(subject).to_not receive(:join)
+      expect { subject.join_persisted_rooms(robot) }.to_not raise_exception
+    end
+
+    it "handles nil persisted_rooms well" do
+      expect(robot).to receive(:respond_to?).and_return(true)
+      expect(robot).to receive(:persisted_rooms).once.and_return(nil)
+      expect(subject).to_not receive(:join)
+      expect { subject.join_persisted_rooms(robot) }.to_not raise_exception
+    end
+
+    it "handles not responding to persisted_rooms well" do
+      expect(robot).to receive(:respond_to?).and_return(false)
+      expect(robot).to_not receive(:persisted_rooms)
+      expect(subject).to_not receive(:join)
+      expect { subject.join_persisted_rooms(robot) }.to_not raise_exception
+    end
+  end
+
   describe "#mention_format" do
     it "returns the name prefixed with an @" do
       expect(subject.mention_format("carl")).to eq("@carl")
@@ -63,6 +100,13 @@ describe Lita::Adapters::HipChat, lita: true do
     it "connects to HipChat" do
       expect(subject.connector).to receive(:connect)
       expect(robot).to receive(:trigger).with(:connected)
+      subject.run
+    end
+
+    it "reconnects to persisted_rooms" do
+      expect(robot).to receive(:persisted_rooms).twice.and_return(["room_3_id", "room_4_id"])
+      expect(subject).to receive(:join).with("room_3_id")
+      expect(subject).to receive(:join).with("room_4_id")
       subject.run
     end
 
