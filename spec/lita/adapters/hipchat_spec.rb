@@ -41,13 +41,6 @@ describe Lita::Adapters::HipChat, lita: true do
       subject.join_persisted_rooms(robot)
     end
 
-    it "handles bad room names well" do
-      expect(robot).to receive(:respond_to?).and_return(true)
-      expect(robot).to receive(:persisted_rooms).twice.and_return(["bad_room_id"])
-      expect(subject).to receive(:join).with("bad_room_id").and_raise("foobar")
-      expect { subject.join_persisted_rooms(robot) }.to_not raise_exception
-    end
-
     it "handles empty persisted_rooms well" do
       expect(robot).to receive(:respond_to?).and_return(true)
       expect(robot).to receive(:persisted_rooms).twice.and_return([])
