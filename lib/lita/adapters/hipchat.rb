@@ -42,9 +42,17 @@ module Lita
         connector.connect
         robot.trigger(:connected)
         rooms.each { |r| join(r) }
+        join_persisted_rooms(robot)
         sleep
       rescue Interrupt
         shut_down
+      end
+
+      def join_persisted_rooms(robot)
+        return unless robot.respond_to?(:persisted_rooms) && robot.persisted_rooms
+        robot.persisted_rooms.each do |room|
+          join(room)
+        end
       end
 
       def send_messages(target, strings)
