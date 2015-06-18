@@ -10,6 +10,7 @@ describe Lita::Adapters::HipChat::Connector, lita: true do
     allow(client).to receive(:connect)
     allow(client).to receive(:send)
     allow(client).to receive(:on_exception)
+    allow(client).to receive(:is_connected?).and_return(true)
     client
   end
 

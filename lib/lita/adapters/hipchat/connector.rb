@@ -111,6 +111,7 @@ module Lita
         def client_connect
           Lita.logger.info("Connecting to HipChat.")
           client.connect(@server)
+          sleep 0.0001 until client.is_connected?
           Lita.logger.debug("Authenticating with HipChat.")
           client.auth(@password)
         end
