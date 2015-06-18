@@ -1,0 +1,9 @@
+en:
+  lita:
+    adapters:
+      hipchat:
+        config:
+          rooms:
+            deprecated: >-
+              config.rooms is deprecated and will be removed in lita-hipchat 4.0.
+              Use the built-in `join` and `part` commands to manage rooms instead.

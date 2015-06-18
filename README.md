@@ -27,7 +27,7 @@ Values for all of the following attributes can be found on the "XMPP/Jabber info
 
 * `server` (String) - The HipChat Server address. Override this with the full domain of your server if using a private HipChat Server installation. Default: `"chat.hipchat.com"`
 * `debug` (Boolean) - If `true`, turns on the underlying Jabber library's (xmpp4r) logger, which is fairly verbose. Default: `false`.
-* `rooms` (Symbol, Array<String>) - An array of room JIDs that Lita should join upon connection. Can also be the symbol `:all`, which will cause Lita to discover and join all rooms. Default: `nil` (no rooms).
+* **DEPRECATED** - `rooms` (Symbol, Array<String>) - An array of room JIDs that Lita should join upon connection. Can also be the symbol `:all`, which will cause Lita to discover and join all rooms. Default: `nil` (no rooms).
 * `muc_domain` (String) - The XMPP Multi-User Chat domain to use. Default: `"conf.hipchat.com"`.
 * `ignore_unknown_users` (Boolean) - Messages generated through HipChat's API which don't come from a real user account will be ignored by the robot. With the default setting of false, Lita will emit a warning but the message will be dispatched to any registered handlers as usual. Default: `false`.
 
@@ -54,6 +54,10 @@ end
 `:disconnected` - When the robot has disconnected from HipChat. No payload.
 `:joined` - When the robot joins a room. Payload: `:room`: The String room ID that was joined.
 `:parted` - When the robot parts from a room. Payload: `:room`: The String room ID that was parted from.
+
+## Managing rooms
+
+To make Lita join or part from rooms, use the [built-in `join` and `part` commands](http://docs.lita.io/getting-started/usage/#managing-rooms). For backwards compatibility, the `rooms` configuration attribute will be supported until lita-hipchat 4.0, but you should remove it and begin using the new command instead. If the configuration attribute is set, lita-hipchat will honor its value and join those rooms instead of the ones persisted to Redis from using the new commands.
 
 ## License
 

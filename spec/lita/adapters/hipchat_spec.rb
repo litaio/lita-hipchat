@@ -7,6 +7,8 @@ describe Lita::Adapters::HipChat, lita: true do
     registry.configure do |config|
       config.adapters.hipchat.jid = "jid"
       config.adapters.hipchat.password = "secret"
+      config.adapters.hipchat.muc_domain = domain
+      config.adapters.hipchat.rooms = rooms
     end
 
     allow(described_class::Connector).to receive(:new).and_return(connector)
@@ -17,6 +19,7 @@ describe Lita::Adapters::HipChat, lita: true do
   let(:robot) { Lita::Robot.new(registry) }
   let(:connector) { instance_double("Lita::Adapters::HipChat::Connector") }
   let(:domain) { "conf.hipchat.com" }
+  let(:rooms) { %w(room_1, room_2) }
 
   it "registers with Lita" do
     expect(Lita.adapters[:hipchat]).to eql(described_class)
@@ -30,36 +33,6 @@ describe Lita::Adapters::HipChat, lita: true do
     it "joins a room" do
       expect(subject.connector).to receive(:join).with(domain, room)
       subject.join(room)
-    end
-  end
-
-  describe "#join_persisted_rooms" do
-    it "attempts to join persisted_rooms" do
-      expect(robot).to receive(:respond_to?).and_return(true)
-      expect(robot).to receive(:persisted_rooms).twice.and_return(["room_3_id", "room_4_id"])
-      expect(subject).to receive(:join).twice
-      subject.join_persisted_rooms(robot)
-    end
-
-    it "handles empty persisted_rooms well" do
-      expect(robot).to receive(:respond_to?).and_return(true)
-      expect(robot).to receive(:persisted_rooms).twice.and_return([])
-      expect(subject).to_not receive(:join)
-      expect { subject.join_persisted_rooms(robot) }.to_not raise_exception
-    end
-
-    it "handles nil persisted_rooms well" do
-      expect(robot).to receive(:respond_to?).and_return(true)
-      expect(robot).to receive(:persisted_rooms).once.and_return(nil)
-      expect(subject).to_not receive(:join)
-      expect { subject.join_persisted_rooms(robot) }.to_not raise_exception
-    end
-
-    it "handles not responding to persisted_rooms well" do
-      expect(robot).to receive(:respond_to?).and_return(false)
-      expect(robot).to_not receive(:persisted_rooms)
-      expect(subject).to_not receive(:join)
-      expect { subject.join_persisted_rooms(robot) }.to_not raise_exception
     end
   end
 
@@ -81,8 +54,6 @@ describe Lita::Adapters::HipChat, lita: true do
   end
 
   describe "#run" do
-    let(:rooms) { ["room_1_id", "room_2_id"] }
-
     before do
       allow(subject.connector).to receive(:connect)
       allow(robot).to receive(:trigger)
@@ -96,39 +67,69 @@ describe Lita::Adapters::HipChat, lita: true do
       subject.run
     end
 
-    it "reconnects to persisted_rooms" do
-      expect(robot).to receive(:persisted_rooms).twice.and_return(["room_3_id", "room_4_id"])
-      expect(subject).to receive(:join).with("room_3_id")
-      expect(subject).to receive(:join).with("room_4_id")
-      subject.run
-    end
-
     context "with a custom domain" do
       let(:domain) { "foo.bar.com" }
+
       it "joins rooms with a custom muc_domain" do
-        registry.config.adapters.hipchat.muc_domain = domain
-        allow(subject).to receive(:rooms).and_return(rooms)
         expect(subject.connector).to receive(:join).with(domain, anything)
+
         subject.run
       end
     end
 
-    it "joins all rooms when config.rooms is :all" do
-      registry.config.adapters.hipchat.rooms = :all
-      allow(subject.connector).to receive(:list_rooms).with(domain).and_return(rooms)
-      rooms.each do |room|
-        expect(subject).to receive(:join).with(room)
+    context "when config.rooms is :all" do
+      before do
+        allow(subject.connector).to receive(:list_rooms).and_return(%w(room_1 room_2))
+        allow(subject.connector).to receive(:join)
       end
-      subject.run
+
+      let(:rooms) { :all }
+
+      it "logs a deprecation warning" do
+        expect(Lita.logger).to receive(:warn) do |msg|
+          expect(msg).to include("config.rooms is deprecated")
+        end
+
+        subject.run
+      end
+
+      it "joins all rooms" do
+        %w(room_1 room_2).each do |room|
+          expect(subject.connector).to receive(:join).with(domain, room)
+        end
+
+        subject.run
+      end
     end
 
-    it "joins rooms specified by config.rooms" do
-      custom_rooms = rooms
-      registry.config.adapters.hipchat.rooms = custom_rooms
-      rooms.each do |room|
-        expect(subject).to receive(:join).with(room)
+    context "when config.rooms contains individual room IDs" do
+      let(:rooms) { ["room_1_only"] }
+
+      it "logs a deprecation warning" do
+        expect(Lita.logger).to receive(:warn) do |msg|
+          expect(msg).to include("config.rooms is deprecated")
+        end
+
+        subject.run
       end
-      subject.run
+
+      it "joins the specified rooms" do
+        expect(subject.connector).to receive(:join).with(domain, "room_1_only")
+
+        subject.run
+      end
+    end
+
+    context "when config.rooms is empty" do
+      before { allow(robot).to receive(:persisted_rooms).and_return(%w(persisted_room_1)) }
+
+      let(:rooms) { [] }
+
+      it "joins rooms persisted in robot.persisted_rooms" do
+        expect(subject.connector).to receive(:join).with(domain, "persisted_room_1")
+
+        subject.run
+      end
     end
 
     it "sleeps the main thread" do

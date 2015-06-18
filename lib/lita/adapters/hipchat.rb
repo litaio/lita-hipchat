@@ -41,18 +41,10 @@ module Lita
       def run
         connector.connect
         robot.trigger(:connected)
-        rooms.each { |r| join(r) }
-        join_persisted_rooms(robot)
+        join_persisted_rooms
         sleep
       rescue Interrupt
         shut_down
-      end
-
-      def join_persisted_rooms(robot)
-        return unless robot.respond_to?(:persisted_rooms) && robot.persisted_rooms
-        robot.persisted_rooms.each do |room|
-          join(room)
-        end
       end
 
       def send_messages(target, strings)
@@ -75,18 +67,35 @@ module Lita
 
       private
 
-      def rooms
-        if config.rooms == :all
-          connector.list_rooms(muc_domain)
-        else
-          Array(config.rooms)
-        end
+      def join_all_rooms?
+        config.rooms == :all
+      end
+
+      def join_persisted_rooms
+        rooms.each { |room| join(room) }
       end
 
       def muc_domain
         config.muc_domain.dup
       end
 
+      def rooms_configured?
+        config.rooms.respond_to?(:empty?) && !config.rooms.empty?
+      end
+
+      def rooms
+        if join_all_rooms? || rooms_configured?
+          log.warn(t("config.rooms.deprecated"))
+
+          if config.rooms == :all
+            connector.list_rooms(muc_domain)
+          else
+            Array(config.rooms)
+          end
+        else
+          robot.persisted_rooms
+        end
+      end
     end
 
     Lita.register_adapter(:hipchat, HipChat)
