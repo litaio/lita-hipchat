@@ -12,6 +12,7 @@ describe Lita::Adapters::HipChat, lita: true do
     end
 
     allow(described_class::Connector).to receive(:new).and_return(connector)
+    allow(connector).to receive(:list_rooms).and_return(rooms)
   end
 
   subject { described_class.new(robot) }
@@ -19,7 +20,7 @@ describe Lita::Adapters::HipChat, lita: true do
   let(:robot) { Lita::Robot.new(registry) }
   let(:connector) { instance_double("Lita::Adapters::HipChat::Connector") }
   let(:domain) { "conf.hipchat.com" }
-  let(:rooms) { %w(room_1, room_2) }
+  let(:rooms) { %w(room_1 room_2) }
 
   it "registers with Lita" do
     expect(Lita.adapters[:hipchat]).to eql(described_class)
@@ -64,6 +65,12 @@ describe Lita::Adapters::HipChat, lita: true do
     it "connects to HipChat" do
       expect(subject.connector).to receive(:connect)
       expect(robot).to receive(:trigger).with(:connected)
+      subject.run
+    end
+
+    it "creates room objects in redis" do
+      expect(Lita::Room).to receive(:create_or_update).with 'room_1'
+      expect(Lita::Room).to receive(:create_or_update).with 'room_2'
       subject.run
     end
 

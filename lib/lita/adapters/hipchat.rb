@@ -42,6 +42,7 @@ module Lita
         connector.connect
         robot.trigger(:connected)
         join_persisted_rooms
+        create_room_objects
         sleep
       rescue Interrupt
         shut_down
@@ -66,6 +67,13 @@ module Lita
       end
 
       private
+
+      def create_room_objects
+        connector.list_rooms(muc_domain).each do |room|
+          room.sub!("@#{muc_domain}", '')
+          Room.create_or_update(room)
+        end
+      end
 
       def join_all_rooms?
         config.rooms == :all
