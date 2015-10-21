@@ -50,10 +50,10 @@ end
 
 ## Events
 
-`:connected` - When the robot has connected to HipChat. No payload.
-`:disconnected` - When the robot has disconnected from HipChat. No payload.
-`:joined` - When the robot joins a room. Payload: `:room`: The String room ID that was joined.
-`:parted` - When the robot parts from a room. Payload: `:room`: The String room ID that was parted from.
+* `:connected` - When the robot has connected to HipChat. No payload.
+* `:disconnected` - When the robot has disconnected from HipChat. No payload.
+* `:joined` - When the robot joins a room. Payload: `:room`: The String room ID that was joined.
+* `:parted` - When the robot parts from a room. Payload: `:room`: The String room ID that was parted from.
 
 ## Managing rooms
 
