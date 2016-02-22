@@ -99,6 +99,8 @@ module Lita
         def shut_down
           Lita.logger.info("Disconnecting from HipChat.")
           client.close
+        rescue IOError, SystemCallError => e
+          Lita.logger.warn("Encountered error during disconnect: #{e}")
         end
 
         private
