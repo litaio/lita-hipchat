@@ -59,6 +59,8 @@ end
 
 To make Lita join or part from rooms, use the [built-in `join` and `part` commands](http://docs.lita.io/getting-started/usage/#managing-rooms). For backwards compatibility, the `rooms` configuration attribute will be supported until lita-hipchat 4.0, but you should remove it and begin using the new command instead. If the configuration attribute is set, lita-hipchat will honor its value and join those rooms instead of the ones persisted to Redis from using the new commands.
 
+**NOTE: You must be a member of the [`config.robot.admins`](https://docs.lita.io/getting-started/configuration/) to use the build in `join` and `part` commands****
+
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)
