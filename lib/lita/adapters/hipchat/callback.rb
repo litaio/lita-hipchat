@@ -17,7 +17,7 @@ module Lita
                 Lita.logger.debug("Joining room #{m.from} on invitation.")
                 robot.join(m.from)
               end
-            else
+            elsif m.body
               user = user_by_jid(m.from)
               source = Source.new(user: user)
               message = Message.new(robot, m.body, source)
