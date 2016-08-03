@@ -13,7 +13,7 @@ module Lita
           client.add_message_callback do |m|
             next if m.type == :error
             if m.body.nil? && m.x.to_s.match(/<invite/)
-              if robot.config.adapters.hipchat.auto_join_on_invite
+              if robot.config.adapters.hipchat.join_on_invite
                 Lita.logger.debug("Joining room #{m.from} on invitation.")
                 robot.join(m.from)
               end
