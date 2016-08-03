@@ -55,6 +55,7 @@ end
 * `:disconnected` - When the robot has disconnected from HipChat. No payload.
 * `:joined` - When the robot joins a room. Payload: `:room`: The String room ID that was joined.
 * `:parted` - When the robot parts from a room. Payload: `:room`: The String room ID that was parted from.
+* `:invited` - When the robot is invited to a room. Payload: `:room`: The String room ID that was invited to. `:user`: The user who invited the robot. `:reason`: The invite reason (message).
 
 ## Managing rooms
 
