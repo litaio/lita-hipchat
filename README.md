@@ -30,6 +30,7 @@ Values for all of the following attributes can be found on the "XMPP/Jabber info
 * **DEPRECATED** - `rooms` (Symbol, Array<String>) - An array of room JIDs that Lita should join upon connection. Can also be the symbol `:all`, which will cause Lita to discover and join all rooms. Default: `nil` (no rooms).
 * `muc_domain` (String) - The XMPP Multi-User Chat domain to use. Default: `"conf.hipchat.com"`.
 * `ignore_unknown_users` (Boolean) - Messages generated through HipChat's API which don't come from a real user account will be ignored by the robot. With the default setting of false, Lita will emit a warning but the message will be dispatched to any registered handlers as usual. Default: `false`.
+* `join_on_invite` (Boolean) - Automatically join the room being invited to. Default: `false`.
 
 **Note: You must set the robot's name to the value shown as "Room nickname" on the XMPP settings page.**
 
