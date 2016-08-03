@@ -12,7 +12,8 @@ module Lita
         def private_message(client)
           client.add_message_callback do |m|
             next if m.type == :error
-            if m.body.nil? && m.x.to_s.match(/<invite/)
+            if m.body.nil? && m.x.elements['invite']
+              robot.trigger(:invited, room: m.from, user: m.x.elements['invite'].attributes['from'], reason: m.x.elements['invite'].elements['reason'].get_text)
               if robot.config.adapters.hipchat.join_on_invite
                 Lita.logger.debug("Joining room #{m.from} on invitation.")
                 robot.join(m.from)
