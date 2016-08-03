@@ -11,13 +11,20 @@ module Lita
 
         def private_message(client)
           client.add_message_callback do |m|
-            next if m.type == :error || m.body.nil?
-            user = user_by_jid(m.from)
-            source = Source.new(user: user)
-            message = Message.new(robot, m.body, source)
-            message.command!
-            Lita.logger.debug("Dispatching PM to Lita from #{user.id}.")
-            robot.receive(message)
+            next if m.type == :error
+            if m.body.nil? && m.x.to_s.match(/<invite/)
+              if robot.config.adapters.hipchat.auto_join_on_invite
+                Lita.logger.debug("Joining room #{m.from} on invitation.")
+                robot.join(m.from)
+              end
+            else
+              user = user_by_jid(m.from)
+              source = Source.new(user: user)
+              message = Message.new(robot, m.body, source)
+              message.command!
+              Lita.logger.debug("Dispatching PM to Lita from #{user.id}.")
+              robot.receive(message)
+            end
           end
         end
 
