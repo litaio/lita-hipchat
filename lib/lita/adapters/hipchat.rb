@@ -16,7 +16,8 @@ module Lita
       config :rooms, type: [Symbol, Array]
       config :muc_domain, type: String, default: "conf.hipchat.com"
       config :ignore_unknown_users, type: [TrueClass, FalseClass], default: false
-
+      config :join_on_invite, type: [TrueClass, FalseClass], default: false
+      
       attr_reader :connector
 
       def initialize(robot)
