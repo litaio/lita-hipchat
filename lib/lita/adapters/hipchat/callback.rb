@@ -49,7 +49,8 @@ module Lita
           User.create(
             user_data["jid"],
             name: user_data["name"],
-            mention_name: user_data["mention_name"]
+            mention_name: user_data["mention_name"],
+            email: user_data["email"]
           )
         end
 
