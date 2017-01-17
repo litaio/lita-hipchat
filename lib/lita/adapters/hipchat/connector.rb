@@ -70,7 +70,8 @@ module Lita
           end
         end
 
-        def message_muc(room_jid, strings)
+        def message_muc(muc_domain, room_jid, strings)
+          room_jid = [room_jid, muc_domain].join('@')
           muc = mucs[room_jid]
           strings.each do |s|
             Lita.logger.debug("Sending message to MUC #{room_jid}: #{s}")

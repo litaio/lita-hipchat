@@ -52,7 +52,7 @@ module Lita
         if target.private_message?
           connector.message_jid(target.user.id, strings)
         else
-          connector.message_muc(target.room, strings)
+          connector.message_muc(muc_domain, target.room, strings)
         end
       end
 
