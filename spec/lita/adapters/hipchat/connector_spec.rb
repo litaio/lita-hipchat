@@ -185,10 +185,10 @@ describe Lita::Adapters::HipChat::Connector, lita: true do
   describe "#message_muc" do
     it "sends the messages to the room" do
       muc = instance_double("Jabber::MUC::SimpleMUCClient")
-      allow(subject).to receive(:mucs).and_return("jid" => muc)
+      allow(subject).to receive(:mucs).and_return("jid@conf.hipchat.com" => muc)
       expect(muc).to receive(:say).with("foo")
       expect(muc).to receive(:say).with("bar")
-      subject.message_muc("jid", ["foo", "bar"])
+      subject.message_muc("conf.hipchat.com", "jid", ["foo", "bar"])
     end
   end
 
