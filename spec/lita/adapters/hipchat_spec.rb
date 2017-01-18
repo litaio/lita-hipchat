@@ -154,7 +154,7 @@ describe Lita::Adapters::HipChat, lita: true do
   describe "#send_messages" do
     it "sends messages to rooms" do
       source = instance_double("Lita::Source", room: "room_id", private_message?: false)
-      expect(subject.connector).to receive(:message_muc).with("room_id", ["Hello!"])
+      expect(subject.connector).to receive(:message_muc).with("conf.hipchat.com", "room_id", ["Hello!"])
       subject.send_messages(source, ["Hello!"])
     end
 
